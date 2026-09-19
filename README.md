@@ -1,7 +1,7 @@
 # chzzk-souls-chaos
 
 치지직 **후원(치즈) · 구독 · 채팅**을 엘든링 카오스 효과로 연결하는 어댑터입니다.
-시청자가 치즈를 쏘면 스트리머 게임에 말레니아가 소환되거나, 캐릭터가 거인이 되거나, 즉사합니다.
+시청자가 치즈를 쏘면 스트리머 게임에 말레니아가 소환되거나, 슬로우 모션이 걸리거나, 즉사합니다.
 
 ```
 치지직 Open API (DONATION / SUBSCRIPTION / CHAT)
@@ -98,7 +98,7 @@ OBS에 **브라우저 소스** `http://localhost:8008/overlay` (1920×1080)를 �
 
   // 금액 구간별 랜덤 풀. 키워드 없으면 금액에 맞는 가장 높은 구간에서 랜덤
   "tiers": [
-    { "min": 1000,  "pool": ["Slow Down", "Small Player", "Giant Player"] },
+    { "min": 1000,  "pool": ["Spawn Dog", "Ultra Zoom", "Half HP"] },
     { "min": 5000,  "pool": ["One HP", "Spawn Dragon", "Teleport Random Grace"] },
     { "min": 10000, "pool": ["Kill Player", "Spawn Malenia", "Spawn Radahn"] }
   ],
@@ -110,7 +110,7 @@ OBS에 **브라우저 소스** `http://localhost:8008/overlay` (1920×1080)를 �
   "chatCommands": { "enabled": true, "prefix": "!", "roles": ["streamer", "streaming_channel_manager"] },
 
   // 아예 쓰지 않을 효과
-  "disabled": ["Fake Crash"]
+  "disabled": ["Pause Game"]
 }
 ```
 
