@@ -1,7 +1,10 @@
 # chzzk-souls-chaos
 
 치지직 **후원(치즈) · 구독 · 채팅**을 엘든링 카오스 효과로 연결하는 어댑터입니다.
-시청자가 치즈를 쏘면 스트리머 게임에 말레니아가 소환되거나, 슬로우 모션이 걸리거나, 즉사합니다.
+시청자가 치즈를 쏘면 스트리머 주변에 박쥐 떼가 날아들거나, 쥐 다섯 마리가 달려들거나, 슬로우 모션이 걸리거나, 즉사합니다.
+
+> 설계 원칙: **강한 보스 한 방보다, 날아다니고 물어뜯는 잔챙이가 슬슬 괴롭히는 게 훨씬 짜증난다.**
+> 그래서 소액 후원은 박쥐·매·잠자리·쥐·늑대·개 같은 성가신 무리, 고액만 보스로 잡혀 있습니다.
 
 ```
 치지직 Open API (DONATION / SUBSCRIPTION / CHAT)
@@ -98,13 +101,14 @@ OBS에 **브라우저 소스** `http://localhost:8008/overlay` (1920×1080)를 �
 ```jsonc
 {
   // 후원 메시지에 이 단어가 있으면 해당 효과 (금액이 그 효과의 티어 이상일 때만)
-  "keywords": { "즉사": "Kill Player", "말레니아": "Spawn Malenia" },
+  "keywords": { "즉사": "Kill Player", "쥐": "Rat Pack", "박쥐": "Bat Swarm", "말레니아": "Spawn Malenia" },
 
   // 금액 구간별 랜덤 풀. 키워드 없으면 금액에 맞는 가장 높은 구간에서 랜덤
   "tiers": [
-    { "min": 1000,  "pool": ["Spawn Dog", "Ultra Zoom", "Half HP"] },
-    { "min": 5000,  "pool": ["One HP", "Spawn Dragon", "Teleport Random Grace"] },
-    { "min": 10000, "pool": ["Kill Player", "Spawn Malenia", "Spawn Radahn"] }
+    { "min": 1000,  "pool": ["Bat", "Warhawk", "Rat", "Wolf", "Ultra Zoom"] },
+    { "min": 3000,  "pool": ["Bat Swarm", "Rat Pack", "Wolf Pack", "Fingercreepers", "Slow Motion"] },
+    { "min": 5000,  "pool": ["Basilisk", "Demi-Human Gang", "One HP", "Teleport Random Grace"] },
+    { "min": 20000, "pool": ["Kill Player", "Spawn Malenia", "Spawn Radahn"] }
   ],
 
   // 구독 시 효과 (보통 이로운 것)
@@ -166,7 +170,8 @@ tools/
 
 Elden Ring 1.17.1 (App 2.7.1) + Hexinton 8.0.4 + Cheat Engine 7.6 에서 실측:
 즉사 · 체력 1/반토막/회복 · FP 0 · 스태미나 0 · 슬로우/2배속 · 초근접 줌/광각 FOV · 랜덤 은총 이동 · 캐릭터 소환(개, c4520, 라단) · 무적 등 보상 토글의 30초 자동 해제.
-아직 눈으로 확인 못 한 것: `c4520` 이 말레니아가 맞는지(Hexinton 드롭다운엔 다른 이름으로 표기됨), 게임 정지.
+말레니아는 `c2120`, `c4520` 은 황금 번개 용(별도 효과로 유지). 쥐 떼 5마리 동시 소환 확인.
+아직 눈으로 확인 못 한 것: 게임 정지, 일부 소환 ID(박쥐/매/잠자리 등은 명령은 성공하지만 개체 등장은 스트리머가 확인 필요).
 
 ## 로드맵
 

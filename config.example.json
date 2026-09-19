@@ -7,22 +7,121 @@
     "모르곳": "Spawn Morgott",
     "고드프리": "Spawn Godfrey",
     "모그": "Spawn Mohg",
-    "드래곤": "Spawn Dragon",
-    "룬곰": "Spawn Runebear",
-    "개": "Spawn 3 Dogs",
-    "쥐": "Spawn 3 Rats",
+    "용": "Spawn Dragon",
+    "번개용": "Spawn Lightning Dragon",
+    "아스텔": "Spawn Astel",
+    "박쥐": "Bat Swarm",
+    "매": "Warhawks",
+    "벌레": "Giant Insect",
+    "잠자리": "Dragonflies",
+    "손가락": "Fingercreepers",
+    "쥐": "Rat Pack",
+    "늑대": "Wolf Pack",
+    "개": "Dog Pack",
+    "바실리스크": "Basilisk",
+    "해골": "Skeletons",
+    "반인": "Demi-Human Gang",
     "텔포": "Teleport Random Grace",
     "슬로우": "Slow Motion",
     "힐": "Heal HP",
     "무적": "God Mode"
   },
   "tiers": [
-    { "min": 1000,  "pool": ["Spawn Dog", "Spawn Rat", "Spawn Warhawk", "Spawn Living Jar", "Ultra Zoom", "Quake Pro FOV", "Half HP", "No FP", "Heal HP"] },
-    { "min": 3000,  "pool": ["Spawn 3 Dogs", "Spawn 3 Rats", "Slow Motion", "Double Time", "No Stamina", "Pause Game", "Spawn Giant Crab", "Spawn Black Knife", "Spawn Crucible Knight"] },
-    { "min": 5000,  "pool": ["One HP", "Teleport Random Grace", "Spawn 3 Dogs", "Spawn Tree Sentinel", "Spawn Runebear", "Spawn Dragon", "Spawn Death Rite Bird"] },
-    { "min": 10000, "pool": ["Kill Player", "Spawn Malenia", "Spawn Radahn", "Spawn Maliketh", "Spawn Morgott", "Spawn Godfrey", "Spawn Mohg", "Spawn Fire Giant"] }
+    {
+      "min": 1000,
+      "pool": [
+        "Bat",
+        "Warhawk",
+        "Dragonflies",
+        "Eagle",
+        "Jellyfish",
+        "Rat",
+        "Wolf",
+        "Dog",
+        "Giant Insect",
+        "Ultra Zoom",
+        "Quake Pro FOV",
+        "Half HP",
+        "No FP"
+      ]
+    },
+    {
+      "min": 3000,
+      "pool": [
+        "Bat Swarm",
+        "Warhawks",
+        "Fingercreepers",
+        "Rat Pack",
+        "Big Rats",
+        "Wolf Pack",
+        "Dog Pack",
+        "Rot Slime",
+        "Land Octopus",
+        "Skeletons",
+        "Slow Motion",
+        "Double Time",
+        "No Stamina",
+        "Operatic Bat"
+      ]
+    },
+    {
+      "min": 5000,
+      "pool": [
+        "Basilisk",
+        "Monstrous Dog",
+        "Demi-Human Gang",
+        "Big Fingercreeper",
+        "Bloodhound Knight",
+        "Black Knife",
+        "One HP",
+        "Teleport Random Grace",
+        "Pause Game"
+      ]
+    },
+    {
+      "min": 10000,
+      "pool": [
+        "Crucible Knight",
+        "Runebear",
+        "Tree Sentinel",
+        "Death Rite Bird",
+        "Kill Player"
+      ]
+    },
+    {
+      "min": 20000,
+      "pool": [
+        "Spawn Malenia",
+        "Spawn Radahn",
+        "Spawn Maliketh",
+        "Spawn Morgott",
+        "Spawn Godfrey",
+        "Spawn Mohg",
+        "Spawn Fire Giant",
+        "Spawn Dragon",
+        "Spawn Lightning Dragon",
+        "Spawn Astel"
+      ]
+    }
   ],
-  "subscription": { "pool": ["Heal HP", "God Mode", "One Hit Kill", "Unlimited Stamina", "Unlimited FP", "Super Poise", "Hide From Enemies"] },
-  "chatCommands": { "enabled": true, "prefix": "!", "roles": ["streamer", "streaming_channel_manager"] },
+  "subscription": {
+    "pool": [
+      "Heal HP",
+      "God Mode",
+      "One Hit Kill",
+      "Unlimited Stamina",
+      "Unlimited FP",
+      "Super Poise",
+      "Hide From Enemies"
+    ]
+  },
+  "chatCommands": {
+    "enabled": true,
+    "prefix": "!",
+    "roles": [
+      "streamer",
+      "streaming_channel_manager"
+    ]
+  },
   "disabled": []
 }

@@ -3,52 +3,836 @@
   "backend": "cheatengine-lua",
   "defaultDuration": 30000,
   "init": [
-    ["activate", 1987705401],
-    ["activate", 1987705402],
-    ["activate", 1987707202]
+    [
+      "activate",
+      1987705401
+    ],
+    [
+      "activate",
+      1987705402
+    ],
+    [
+      "activate",
+      1987707202
+    ]
   ],
   "effects": {
-    "Kill Player":        { "label": "즉사",            "on": [["activate", 1337304928]] },
-    "One HP":             { "label": "체력 1",          "on": [["set", 1337192613, "1"]] },
-    "Half HP":            { "label": "체력 반토막",     "on": [["lua", "local r=chaosRec; r(1337192613).Value=tostring(math.floor(tonumber(r(1337192613).Value)/2))"]] },
-    "Heal HP":            { "label": "체력 회복",       "on": [["lua", "chaosRec(1337192613).Value=chaosRec(1337193290).Value"]] },
-    "No FP":              { "label": "FP 0",            "on": [["set", 1337192614, "0"]] },
-
-    "No Stamina":         { "label": "스태미나 0",      "on": [["freeze", 1337192615, "0"]], "off": [["unfreeze", 1337192615]] },
-    "Slow Motion":        { "label": "슬로우 모션",     "on": [["speed", "0.4"]], "off": [["speed", "1"]] },
-    "Double Time":        { "label": "2배속",           "on": [["speed", "2"]],   "off": [["speed", "1"]] },
-    "Pause Game":         { "label": "게임 정지",       "on": [["activate", 1337257998]], "off": [["deactivate", 1337257998]], "duration": 5000 },
-    "Ultra Zoom":         { "label": "초근접 줌",       "on": [["set", 1987707203, "0.45"]], "off": [["set", 1987707203, "1"]] },
-    "Quake Pro FOV":      { "label": "광각 FOV",        "on": [["set", 1987707203, "1.8"]],  "off": [["set", 1987707203, "1"]] },
-    "Teleport Random Grace": { "label": "랜덤 은총 이동", "on": [["lua", "local g={1042362951,10002958,12012951,12012954,12012956,12022953,12032953,12072951,14002950,15002952,15002955,15002957,16002952,30202950,31102950,31112950,32012950,32022950,32082950,35002953,1035452950}; chaosRec(1337304716).Value=tostring(g[math.random(#g)]); chaosRec(1337304717).Active=true"]] },
-
-    "Spawn Radahn":       { "label": "라단 소환",         "on": [["spawn", "c4730"]] },
-    "Spawn Malenia":      { "label": "말레니아 소환",     "on": [["spawn", "c4520"]] },
-    "Spawn Maliketh":     { "label": "말리케스 소환",     "on": [["spawn", "c2110"]] },
-    "Spawn Morgott":      { "label": "모르곳 소환",       "on": [["spawn", "c2130"]] },
-    "Spawn Godfrey":      { "label": "고드프리 소환",     "on": [["spawn", "c4720"]] },
-    "Spawn Mohg":         { "label": "모그 소환",         "on": [["spawn", "c4800"]] },
-    "Spawn Fire Giant":   { "label": "화염 거인 소환",    "on": [["spawn", "c4760"]] },
-    "Spawn Tree Sentinel":{ "label": "나무 파수꾼 소환",  "on": [["spawn", "c3251"]] },
-    "Spawn Crucible Knight": { "label": "도가니 기사 소환", "on": [["spawn", "c2500"]] },
-    "Spawn Black Knife":  { "label": "검은 칼 암살자 소환","on": [["spawn", "c2100"]] },
-    "Spawn Runebear":     { "label": "룬곰 소환",         "on": [["spawn", "c4630"]] },
-    "Spawn Giant Crab":   { "label": "거대 게 소환",      "on": [["spawn", "c2270"]] },
-    "Spawn Dragon":       { "label": "드래곤 소환",       "on": [["spawn", "c4500"]] },
-    "Spawn Death Rite Bird": { "label": "사영조 소환",    "on": [["spawn", "c4980"]] },
-    "Spawn Dog":          { "label": "개 소환",           "on": [["spawn", "c4160"]] },
-    "Spawn 3 Dogs":       { "label": "개 3마리",          "on": [["spawn", "c4160"], ["wait", 700], ["spawn", "c4160"], ["wait", 700], ["spawn", "c4160"]] },
-    "Spawn Rat":          { "label": "쥐 소환",           "on": [["spawn", "c4080"]] },
-    "Spawn 3 Rats":       { "label": "쥐 3마리",          "on": [["spawn", "c4080"], ["wait", 700], ["spawn", "c4080"], ["wait", 700], ["spawn", "c4080"]] },
-    "Spawn Warhawk":      { "label": "전투매 소환",       "on": [["spawn", "c4210"]] },
-    "Spawn Living Jar":   { "label": "살아있는 항아리",   "on": [["spawn", "c4491"]] },
-
-    "God Mode":           { "label": "무적 (보상)",       "on": [["activate", 1337304879]], "off": [["deactivate", 1337304879]] },
-    "One Hit Kill":       { "label": "한방컷 (보상)",     "on": [["activate", 1337257017]], "off": [["deactivate", 1337257017]] },
-    "Unlimited Stamina":  { "label": "무한 스태미나 (보상)", "on": [["activate", 1337304921]], "off": [["deactivate", 1337304921]] },
-    "Unlimited FP":       { "label": "무한 FP (보상)",    "on": [["activate", 1337304920]], "off": [["deactivate", 1337304920]] },
-    "Super Poise":        { "label": "슈퍼 강인도 (보상)", "on": [["activate", 1337256999]], "off": [["deactivate", 1337256999]] },
-    "Hide From Enemies":  { "label": "투명화 (보상)",     "on": [["activate", 1337256996]], "off": [["deactivate", 1337256996]] },
-    "No Hitbox":          { "label": "피격 무시 (보상)",  "on": [["activate", 1337251122]], "off": [["deactivate", 1337251122]] }
+    "Kill Player": {
+      "label": "즉사",
+      "on": [
+        [
+          "activate",
+          1337304928
+        ]
+      ]
+    },
+    "One HP": {
+      "label": "체력 1",
+      "on": [
+        [
+          "set",
+          1337192613,
+          "1"
+        ]
+      ]
+    },
+    "Half HP": {
+      "label": "체력 반토막",
+      "on": [
+        [
+          "lua",
+          "local r=chaosRec; r(1337192613).Value=tostring(math.floor(tonumber(r(1337192613).Value)/2))"
+        ]
+      ]
+    },
+    "Heal HP": {
+      "label": "체력 회복",
+      "on": [
+        [
+          "lua",
+          "chaosRec(1337192613).Value=chaosRec(1337193290).Value"
+        ]
+      ]
+    },
+    "No FP": {
+      "label": "FP 0",
+      "on": [
+        [
+          "set",
+          1337192614,
+          "0"
+        ]
+      ]
+    },
+    "No Stamina": {
+      "label": "스태미나 0",
+      "on": [
+        [
+          "freeze",
+          1337192615,
+          "0"
+        ]
+      ],
+      "off": [
+        [
+          "unfreeze",
+          1337192615
+        ]
+      ]
+    },
+    "Slow Motion": {
+      "label": "슬로우 모션",
+      "on": [
+        [
+          "speed",
+          "0.4"
+        ]
+      ],
+      "off": [
+        [
+          "speed",
+          "1"
+        ]
+      ]
+    },
+    "Double Time": {
+      "label": "2배속",
+      "on": [
+        [
+          "speed",
+          "2"
+        ]
+      ],
+      "off": [
+        [
+          "speed",
+          "1"
+        ]
+      ]
+    },
+    "Pause Game": {
+      "label": "게임 정지",
+      "on": [
+        [
+          "activate",
+          1337257998
+        ]
+      ],
+      "off": [
+        [
+          "deactivate",
+          1337257998
+        ]
+      ],
+      "duration": 5000
+    },
+    "Ultra Zoom": {
+      "label": "초근접 줌",
+      "on": [
+        [
+          "set",
+          1987707203,
+          "0.45"
+        ]
+      ],
+      "off": [
+        [
+          "set",
+          1987707203,
+          "1"
+        ]
+      ]
+    },
+    "Quake Pro FOV": {
+      "label": "광각 FOV",
+      "on": [
+        [
+          "set",
+          1987707203,
+          "1.8"
+        ]
+      ],
+      "off": [
+        [
+          "set",
+          1987707203,
+          "1"
+        ]
+      ]
+    },
+    "Teleport Random Grace": {
+      "label": "랜덤 은총 이동",
+      "on": [
+        [
+          "lua",
+          "local g={1042362951,10002958,12012951,12012954,12012956,12022953,12032953,12072951,14002950,15002952,15002955,15002957,16002952,30202950,31102950,31112950,32012950,32022950,32082950,35002953,1035452950}; chaosRec(1337304716).Value=tostring(g[math.random(#g)]); chaosRec(1337304717).Active=true"
+        ]
+      ]
+    },
+    "God Mode": {
+      "label": "무적 (보상)",
+      "on": [
+        [
+          "activate",
+          1337304879
+        ]
+      ],
+      "off": [
+        [
+          "deactivate",
+          1337304879
+        ]
+      ]
+    },
+    "One Hit Kill": {
+      "label": "한방컷 (보상)",
+      "on": [
+        [
+          "activate",
+          1337257017
+        ]
+      ],
+      "off": [
+        [
+          "deactivate",
+          1337257017
+        ]
+      ]
+    },
+    "Unlimited Stamina": {
+      "label": "무한 스태미나 (보상)",
+      "on": [
+        [
+          "activate",
+          1337304921
+        ]
+      ],
+      "off": [
+        [
+          "deactivate",
+          1337304921
+        ]
+      ]
+    },
+    "Unlimited FP": {
+      "label": "무한 FP (보상)",
+      "on": [
+        [
+          "activate",
+          1337304920
+        ]
+      ],
+      "off": [
+        [
+          "deactivate",
+          1337304920
+        ]
+      ]
+    },
+    "Super Poise": {
+      "label": "슈퍼 강인도 (보상)",
+      "on": [
+        [
+          "activate",
+          1337256999
+        ]
+      ],
+      "off": [
+        [
+          "deactivate",
+          1337256999
+        ]
+      ]
+    },
+    "Hide From Enemies": {
+      "label": "투명화 (보상)",
+      "on": [
+        [
+          "activate",
+          1337256996
+        ]
+      ],
+      "off": [
+        [
+          "deactivate",
+          1337256996
+        ]
+      ]
+    },
+    "No Hitbox": {
+      "label": "피격 무시 (보상)",
+      "on": [
+        [
+          "activate",
+          1337251122
+        ]
+      ],
+      "off": [
+        [
+          "deactivate",
+          1337251122
+        ]
+      ]
+    },
+    "Bat": {
+      "label": "박쥐",
+      "on": [
+        [
+          "spawn",
+          "c4200"
+        ]
+      ]
+    },
+    "Bat Swarm": {
+      "label": "박쥐 떼",
+      "on": [
+        [
+          "spawn",
+          "c4200"
+        ],
+        [
+          "wait",
+          400
+        ],
+        [
+          "spawn",
+          "c4200"
+        ],
+        [
+          "wait",
+          400
+        ],
+        [
+          "spawn",
+          "c4200"
+        ],
+        [
+          "wait",
+          400
+        ],
+        [
+          "spawn",
+          "c4200"
+        ]
+      ]
+    },
+    "Operatic Bat": {
+      "label": "노래하는 박쥐",
+      "on": [
+        [
+          "spawn",
+          "c4201"
+        ]
+      ]
+    },
+    "Warhawk": {
+      "label": "전투매",
+      "on": [
+        [
+          "spawn",
+          "c4210"
+        ]
+      ]
+    },
+    "Warhawks": {
+      "label": "전투매 2마리",
+      "on": [
+        [
+          "spawn",
+          "c4210"
+        ],
+        [
+          "wait",
+          600
+        ],
+        [
+          "spawn",
+          "c4210"
+        ]
+      ]
+    },
+    "Giant Insect": {
+      "label": "거대 벌레",
+      "on": [
+        [
+          "spawn",
+          "c4280"
+        ]
+      ]
+    },
+    "Dragonflies": {
+      "label": "잠자리 떼",
+      "on": [
+        [
+          "spawn",
+          "c6080"
+        ],
+        [
+          "wait",
+          400
+        ],
+        [
+          "spawn",
+          "c6080"
+        ],
+        [
+          "wait",
+          400
+        ],
+        [
+          "spawn",
+          "c6080"
+        ],
+        [
+          "wait",
+          400
+        ],
+        [
+          "spawn",
+          "c6080"
+        ]
+      ]
+    },
+    "Eagle": {
+      "label": "독수리",
+      "on": [
+        [
+          "spawn",
+          "c6001"
+        ]
+      ]
+    },
+    "Jellyfish": {
+      "label": "해파리",
+      "on": [
+        [
+          "spawn",
+          "c4180"
+        ],
+        [
+          "wait",
+          600
+        ],
+        [
+          "spawn",
+          "c4180"
+        ]
+      ]
+    },
+    "Fingercreepers": {
+      "label": "손가락 벌레 3마리",
+      "on": [
+        [
+          "spawn",
+          "c4250"
+        ],
+        [
+          "wait",
+          600
+        ],
+        [
+          "spawn",
+          "c4250"
+        ],
+        [
+          "wait",
+          600
+        ],
+        [
+          "spawn",
+          "c4250"
+        ]
+      ]
+    },
+    "Big Fingercreeper": {
+      "label": "거대 손가락 벌레",
+      "on": [
+        [
+          "spawn",
+          "c4240"
+        ]
+      ]
+    },
+    "Rat": {
+      "label": "쥐",
+      "on": [
+        [
+          "spawn",
+          "c4080"
+        ]
+      ]
+    },
+    "Rat Pack": {
+      "label": "쥐 떼 5마리",
+      "on": [
+        [
+          "spawn",
+          "c4080"
+        ],
+        [
+          "wait",
+          400
+        ],
+        [
+          "spawn",
+          "c4080"
+        ],
+        [
+          "wait",
+          400
+        ],
+        [
+          "spawn",
+          "c4080"
+        ],
+        [
+          "wait",
+          400
+        ],
+        [
+          "spawn",
+          "c4080"
+        ],
+        [
+          "wait",
+          400
+        ],
+        [
+          "spawn",
+          "c4080"
+        ]
+      ]
+    },
+    "Big Rats": {
+      "label": "큰 쥐 2마리",
+      "on": [
+        [
+          "spawn",
+          "c4090"
+        ],
+        [
+          "wait",
+          600
+        ],
+        [
+          "spawn",
+          "c4090"
+        ]
+      ]
+    },
+    "Wolf": {
+      "label": "늑대",
+      "on": [
+        [
+          "spawn",
+          "c4070"
+        ]
+      ]
+    },
+    "Wolf Pack": {
+      "label": "늑대 무리 3마리",
+      "on": [
+        [
+          "spawn",
+          "c4070"
+        ],
+        [
+          "wait",
+          600
+        ],
+        [
+          "spawn",
+          "c4070"
+        ],
+        [
+          "wait",
+          600
+        ],
+        [
+          "spawn",
+          "c4070"
+        ]
+      ]
+    },
+    "Dog": {
+      "label": "개",
+      "on": [
+        [
+          "spawn",
+          "c4160"
+        ]
+      ]
+    },
+    "Dog Pack": {
+      "label": "개 3마리",
+      "on": [
+        [
+          "spawn",
+          "c4160"
+        ],
+        [
+          "wait",
+          600
+        ],
+        [
+          "spawn",
+          "c4160"
+        ],
+        [
+          "wait",
+          600
+        ],
+        [
+          "spawn",
+          "c4160"
+        ]
+      ]
+    },
+    "Monstrous Dog": {
+      "label": "괴물 개",
+      "on": [
+        [
+          "spawn",
+          "c4550"
+        ]
+      ]
+    },
+    "Basilisk": {
+      "label": "바실리스크(사혈)",
+      "on": [
+        [
+          "spawn",
+          "c4150"
+        ]
+      ]
+    },
+    "Rot Slime": {
+      "label": "부패 슬라임",
+      "on": [
+        [
+          "spawn",
+          "c4170"
+        ],
+        [
+          "wait",
+          600
+        ],
+        [
+          "spawn",
+          "c4170"
+        ]
+      ]
+    },
+    "Land Octopus": {
+      "label": "육지 문어",
+      "on": [
+        [
+          "spawn",
+          "c4230"
+        ]
+      ]
+    },
+    "Demi-Human Gang": {
+      "label": "반인 무리 4마리",
+      "on": [
+        [
+          "spawn",
+          "c4100"
+        ],
+        [
+          "wait",
+          400
+        ],
+        [
+          "spawn",
+          "c4100"
+        ],
+        [
+          "wait",
+          400
+        ],
+        [
+          "spawn",
+          "c4100"
+        ],
+        [
+          "wait",
+          400
+        ],
+        [
+          "spawn",
+          "c4100"
+        ]
+      ]
+    },
+    "Skeletons": {
+      "label": "해골 3마리",
+      "on": [
+        [
+          "spawn",
+          "c3510"
+        ],
+        [
+          "wait",
+          600
+        ],
+        [
+          "spawn",
+          "c3510"
+        ],
+        [
+          "wait",
+          600
+        ],
+        [
+          "spawn",
+          "c3510"
+        ]
+      ]
+    },
+    "Bloodhound Knight": {
+      "label": "블러드하운드 기사",
+      "on": [
+        [
+          "spawn",
+          "c4290"
+        ]
+      ]
+    },
+    "Black Knife": {
+      "label": "검은 칼 암살자",
+      "on": [
+        [
+          "spawn",
+          "c2100"
+        ]
+      ]
+    },
+    "Crucible Knight": {
+      "label": "도가니 기사",
+      "on": [
+        [
+          "spawn",
+          "c2500"
+        ]
+      ]
+    },
+    "Runebear": {
+      "label": "룬곰",
+      "on": [
+        [
+          "spawn",
+          "c4630"
+        ]
+      ]
+    },
+    "Tree Sentinel": {
+      "label": "나무 파수꾼",
+      "on": [
+        [
+          "spawn",
+          "c3251"
+        ]
+      ]
+    },
+    "Death Rite Bird": {
+      "label": "사영조",
+      "on": [
+        [
+          "spawn",
+          "c4980"
+        ]
+      ]
+    },
+    "Spawn Malenia": {
+      "label": "말레니아 소환",
+      "on": [
+        [
+          "spawn",
+          "c2120"
+        ]
+      ]
+    },
+    "Spawn Radahn": {
+      "label": "라단 소환",
+      "on": [
+        [
+          "spawn",
+          "c4730"
+        ]
+      ]
+    },
+    "Spawn Maliketh": {
+      "label": "말리케스 소환",
+      "on": [
+        [
+          "spawn",
+          "c2110"
+        ]
+      ]
+    },
+    "Spawn Morgott": {
+      "label": "모르곳 소환",
+      "on": [
+        [
+          "spawn",
+          "c2130"
+        ]
+      ]
+    },
+    "Spawn Godfrey": {
+      "label": "고드프리 소환",
+      "on": [
+        [
+          "spawn",
+          "c4720"
+        ]
+      ]
+    },
+    "Spawn Mohg": {
+      "label": "모그 소환",
+      "on": [
+        [
+          "spawn",
+          "c4800"
+        ]
+      ]
+    },
+    "Spawn Fire Giant": {
+      "label": "화염 거인 소환",
+      "on": [
+        [
+          "spawn",
+          "c4760"
+        ]
+      ]
+    },
+    "Spawn Dragon": {
+      "label": "드래곤 소환",
+      "on": [
+        [
+          "spawn",
+          "c4500"
+        ]
+      ]
+    },
+    "Spawn Lightning Dragon": {
+      "label": "황금 번개 용 소환",
+      "on": [
+        [
+          "spawn",
+          "c4520"
+        ]
+      ]
+    },
+    "Spawn Astel": {
+      "label": "아스텔 소환",
+      "on": [
+        [
+          "spawn",
+          "c4620"
+        ]
+      ]
+    }
   }
 }
