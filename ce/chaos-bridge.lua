@@ -68,7 +68,31 @@ local function spawn(chrId, npcParam)
   rec(HEX.spawnDebug).Active = true
 end
 
+-- 테이블의 Lua 가 띄우는 안내 팝업(버전 경고 등)을 막는다. 전체화면 게임 포커스를 뺏기 때문.
+local function silenceDialogs()
+  showMessage = function() end
+  messageDialog = function() return mrOk end
+end
+
+local ENABLE_ID = 1337092247  -- Hexinton [ Enable ]
+
+local function setup(ctPath)
+  if getOpenedProcessID() == 0 then
+    openProcess('eldenring.exe')
+    if getOpenedProcessID() == 0 then error('eldenring.exe not running') end
+  end
+  if getAddressList().Count == 0 then
+    silenceDialogs()
+    loadTable(ctPath)
+  end
+  local en = getAddressList().getMemoryRecordByID(ENABLE_ID)
+  if not en then error('[ Enable ] not found — is this the Hexinton table?') end
+  if not en.Active then en.Active = true end
+  log(('setup: pid=%d entries=%d enable=%s'):format(getOpenedProcessID(), getAddressList().Count, tostring(en.Active)))
+end
+
 local handlers = {
+  setup      = function(...) setup(table.concat({ ... }, ' ')) end,
   ping       = function() log('pong') end,
   activate   = function(id) rec(id).Active = true end,
   deactivate = function(id) rec(id).Active = false end,

@@ -28,7 +28,7 @@ Cheat Engine 안에서 도는 작은 Lua 브릿지가 명령을 받아 실행하
 | 항목 | 비고 |
 |---|---|
 | Elden Ring (Steam) | EAC 끄고 오프라인 실행 |
-| [Cheat Engine](https://www.cheatengine.org/) 7.5+ | 공식 설치기는 번들 광고가 붙으니, `scoop install cheat-engine`(번들 없음) 권장 |
+| [Cheat Engine](https://www.cheatengine.org/) 7.5+ | 공식 설치기는 번들 광고가 붙으니, `scoop install cheat-engine`(번들 없음, 7.6) 권장. 7.6 에서 검증됨 |
 | [Hexinton All in One](https://www.nexusmods.com/eldenring/mods/48) 8.0.x | Nexus 로그인 후 Manual download → zip 안의 `.CT` 파일 |
 | [Node.js](https://nodejs.org/) 20 이상 | |
 | 치지직 개발자센터 앱 | 아래 참고 |
@@ -69,9 +69,13 @@ npm run auth
 
 ### 4. 게임 + Cheat Engine 실행
 
-1. 엘든링을 **오프라인**으로 실행 (Hexinton 안내의 offline launcher, 또는 EAC 프로세스 종료 후 `eldenring.exe` 직접 실행)
-2. Cheat Engine 실행 → Hexinton `.CT` 열기 → 엘든링 프로세스 선택 → 맨 위 **[ Enable ]** 체크
-3. Ctrl+Alt+L(Lua Engine) 창에 `[chaos] bridge ready` 가 보이면 브릿지 준비 완료
+1. 엘든링을 **오프라인**으로 실행 (게임 폴더의 `start_game_in_offline_mode.exe`, 또는 EAC 프로세스 종료 후 `eldenring.exe` 직접 실행). **창 모드 권장** — 전체화면 전용은 포커스를 잃으면 최소화됩니다.
+2. `.env` 의 `HEXINTON_CT` 에 받은 `.CT` 경로를 넣고:
+   ```bash
+   npm run attach
+   ```
+   Cheat Engine 을 띄우고, 게임에 붙이고, 테이블을 불러오고, `[ Enable ]` 까지 자동으로 켭니다 (1분 정도, 팝업 없음).
+   수동으로 하려면: CE 실행 → `.CT` 열기 → 엘든링 프로세스 선택 → 맨 위 **[ Enable ]** 체크.
 
 ### 5. 어댑터 실행
 
@@ -158,9 +162,15 @@ tools/
 - 치트 테이블은 Hexinton 팀이 유지보수합니다. 엘든링 패치 후엔 테이블 업데이트를 기다려야 할 수 있고, 메모리 레코드 ID가 바뀌면 프로필의 ID를 맞춰야 합니다.
 - 레거시 `devpoland-hotkey` 프로필은 글로벌 핫키 방식이라 게임 창 포커스가 필요합니다.
 
+## 검증 상태
+
+Elden Ring 1.17.1 (App 2.7.1) + Hexinton 8.0.4 + Cheat Engine 7.6 에서 실측:
+즉사 · 체력 1/반토막/회복 · FP 0 · 스태미나 0 · 슬로우/2배속 · 초근접 줌/광각 FOV · 랜덤 은총 이동 · 캐릭터 소환(개, c4520, 라단) · 무적 등 보상 토글의 30초 자동 해제.
+아직 눈으로 확인 못 한 것: `c4520` 이 말레니아가 맞는지(Hexinton 드롭다운엔 다른 이름으로 표기됨), 게임 정지.
+
 ## 로드맵
 
-- [ ] 실제 게임에서 각 효과 검증 (스폰 좌표, NpcParam ID 등)
+- [ ] 소환 ID 전수 확인 (스포너 HP 로 추정 가능)
 - [ ] 상태 이상 효과 (ApplyEffect SpEffect ID)
 - [ ] 다른 소울류(다크소울3, 세키로) 프로필
 - [ ] 효과 투표 모드 (채팅 1/2/3/4)

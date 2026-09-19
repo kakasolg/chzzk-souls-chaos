@@ -9,7 +9,8 @@
     "auth": "node src/chzzk/auth.js",
     "fake": "node tools/fake-donation.js",
     "keys": "node tools/list-effects.js",
-    "install-bridge": "node tools/install-bridge.js"
+    "install-bridge": "node tools/install-bridge.js",
+    "attach": "node tools/attach.js"
   },
   "engines": { "node": ">=20" },
   "license": "MIT",

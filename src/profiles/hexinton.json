@@ -20,7 +20,6 @@
     "Pause Game":         { "label": "게임 정지",       "on": [["activate", 1337257998]], "off": [["deactivate", 1337257998]], "duration": 5000 },
     "Ultra Zoom":         { "label": "초근접 줌",       "on": [["set", 1987707203, "0.45"]], "off": [["set", 1987707203, "1"]] },
     "Quake Pro FOV":      { "label": "광각 FOV",        "on": [["set", 1987707203, "1.8"]],  "off": [["set", 1987707203, "1"]] },
-    "Aggro Everything":   { "label": "어그로 폭발",     "on": [["activate", 1337304934]], "off": [["deactivate", 1337304934]] },
     "Teleport Random Grace": { "label": "랜덤 은총 이동", "on": [["lua", "local g={1042362951,10002958,12012951,12012954,12012956,12022953,12032953,12072951,14002950,15002952,15002955,15002957,16002952,30202950,31102950,31112950,32012950,32022950,32082950,35002953,1035452950}; chaosRec(1337304716).Value=tostring(g[math.random(#g)]); chaosRec(1337304717).Active=true"]] },
 
     "Spawn Radahn":       { "label": "라단 소환",         "on": [["spawn", "c4730"]] },

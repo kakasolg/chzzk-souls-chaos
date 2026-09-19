@@ -19,7 +19,7 @@
   "tiers": [
     { "min": 1000,  "pool": ["Spawn Dog", "Spawn Rat", "Spawn Warhawk", "Spawn Living Jar", "Ultra Zoom", "Quake Pro FOV", "Half HP", "No FP", "Heal HP"] },
     { "min": 3000,  "pool": ["Spawn 3 Dogs", "Spawn 3 Rats", "Slow Motion", "Double Time", "No Stamina", "Pause Game", "Spawn Giant Crab", "Spawn Black Knife", "Spawn Crucible Knight"] },
-    { "min": 5000,  "pool": ["One HP", "Aggro Everything", "Teleport Random Grace", "Spawn Tree Sentinel", "Spawn Runebear", "Spawn Dragon", "Spawn Death Rite Bird"] },
+    { "min": 5000,  "pool": ["One HP", "Teleport Random Grace", "Spawn 3 Dogs", "Spawn Tree Sentinel", "Spawn Runebear", "Spawn Dragon", "Spawn Death Rite Bird"] },
     { "min": 10000, "pool": ["Kill Player", "Spawn Malenia", "Spawn Radahn", "Spawn Maliketh", "Spawn Morgott", "Spawn Godfrey", "Spawn Mohg", "Spawn Fire Giant"] }
   ],
   "subscription": { "pool": ["Heal HP", "God Mode", "One Hit Kill", "Unlimited Stamina", "Unlimited FP", "Super Poise", "Hide From Enemies"] },
