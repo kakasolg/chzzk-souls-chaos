@@ -150,7 +150,7 @@ tools/
 └─ install-bridge.js  브릿지를 CE autorun 폴더에 복사
 ```
 
-브릿지 로그: `%TEMP%\chzzk-souls-chaosridge.log` — 효과가 안 먹으면 여기서 `FAIL` 줄을 확인하세요.
+브릿지 로그: `%TEMP%\chzzk-souls-chaos\bridge.log` — 효과가 안 먹으면 여기서 `FAIL` 줄을 확인하세요.
 
 ### 알려진 한계
 
