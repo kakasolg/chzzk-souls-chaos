@@ -1,0 +1,21 @@
+{
+  "keywords": {
+    "즉사": "Kill Player",
+    "말레니아": "SPAWN MALENIA",
+    "라단": "Spawn Promised Consort Radahn",
+    "드래곤": "SPAWN A DRAGON",
+    "힐": "Heal HP",
+    "슬로우": "Slow Motion",
+    "거인": "Giant Player",
+    "소인": "Small Player"
+  },
+  "tiers": [
+    { "min": 1000,  "pool": ["Slow Down", "Small Player", "Giant Player", "Paper Mario", "Ultra Zoom", "Aussie Simulator", "Spawn 3 Rats", "Spawn 3 Dogs", "Heal HP"] },
+    { "min": 3000,  "pool": ["Slow Motion", "Double Time", "No Stamina", "Random Weapon", "Bad PC", "Stop Moving", "TP Player to random NPC", "Spawn 3 Hawks", "SPAWN A GIANT RAT"] },
+    { "min": 5000,  "pool": ["Hitless Challenge", "Random Weapon Every Second", "Randomise All Stats", "TP all NPCs to Player", "SPAWN INVISIBLE ASSASIN", "SPAWN A DRAGON", "Teleport to random grace"] },
+    { "min": 10000, "pool": ["Kill Player", "SPAWN MALENIA", "Spawn Promised Consort Radahn", "Spawn Fake Promised Consort Radahn"] }
+  ],
+  "subscription": { "pool": ["Heal HP", "SPAWN A FRIENDLY DOG", "SPAWN A POT FRIEND"] },
+  "chatCommands": { "enabled": true, "prefix": "!", "roles": ["streamer", "streaming_channel_manager"] },
+  "disabled": ["Fake Crash"]
+}

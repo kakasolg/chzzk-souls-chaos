@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>chaos overlay</title>
+<style>
+  body { margin: 0; background: transparent; font-family: "Malgun Gothic", sans-serif; color: #fff; }
+  #list { position: absolute; top: 16px; right: 16px; display: flex; flex-direction: column; gap: 8px; width: 360px; }
+  .fx { background: rgba(0,0,0,.65); border-left: 6px solid #e8b04b; padding: 10px 14px; border-radius: 6px;
+        text-shadow: 0 1px 2px #000; animation: in .3s ease-out; }
+  .fx.end { opacity: .35; border-color: #666; }
+  .fx b { font-size: 20px; }
+  .fx small { display: block; opacity: .85; }
+  @keyframes in { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+</style>
+</head>
+<body>
+<div id="list"></div>
+<script>
+  const list = document.getElementById('list');
+  const rows = new Map();
+  function connect() {
+    const ws = new WebSocket('ws://' + location.host);
+    ws.onmessage = (e) => {
+      const m = JSON.parse(e.data);
+      const key = m.name + '|' + (m.by || '');
+      if (m.type === 'start') {
+        const d = document.createElement('div');
+        d.className = 'fx';
+        const amount = m.amount ? m.amount.toLocaleString() + '원' : '';
+        d.innerHTML = '<b>' + m.label + '</b><small>' + (m.by || '') + ' ' + amount + '</small>';
+        list.prepend(d);
+        rows.set(key, d);
+        while (list.children.length > 6) list.lastChild.remove();
+      } else if (m.type === 'end') {
+        const d = rows.get(key);
+        if (d) { d.classList.add('end'); setTimeout(() => d.remove(), 4000); rows.delete(key); }
+      }
+    };
+    ws.onclose = () => setTimeout(connect, 2000);
+  }
+  connect();
+</script>
+</body>
+</html>
