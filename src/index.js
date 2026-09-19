@@ -9,6 +9,7 @@ import { EffectExecutor } from './effects/executor.js';
 import { Router } from './effects/router.js';
 import { ChzzkSession } from './chzzk/session.js';
 import { loadTokens } from './chzzk/api.js';
+import { YouTubeSource } from './sources/youtube.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const readJson = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
@@ -83,11 +84,11 @@ function handle(kind, data, source) {
   if (pick) executor.trigger(pick.effect, { by, amount, source, reason: pick.reason });
 }
 
-// ── 치지직 연결 (tokens.json 있을 때만) ──
+// ── 입력 소스 연결 (자격 증명 있는 것만) ──
 async function connectChzzk() {
   const client = { id: process.env.CHZZK_CLIENT_ID, secret: process.env.CHZZK_CLIENT_SECRET };
   if (!client.id || !client.secret || !loadTokens()) {
-    console.log('ℹ 치지직 미연결 (CHZZK_CLIENT_ID/SECRET 또는 tokens.json 없음). 가짜 이벤트 모드로만 동작합니다.');
+    console.log('ℹ 치지직 미연결 (CHZZK_CLIENT_ID/SECRET 또는 tokens.json 없음)');
     return;
   }
   const session = new ChzzkSession(client);
@@ -101,6 +102,27 @@ async function connectChzzk() {
   await session.start();
 }
 
+async function connectYouTube() {
+  const client = { id: process.env.YOUTUBE_CLIENT_ID, secret: process.env.YOUTUBE_CLIENT_SECRET };
+  if (!client.id || !client.secret || !YouTubeSource.loadTokens()) {
+    console.log('ℹ 유튜브 미연결 (YOUTUBE_CLIENT_ID/SECRET 또는 youtube-tokens.json 없음)');
+    return;
+  }
+  const yt = new YouTubeSource(client, {
+    rates: config.youtube?.rates,
+    minPollMs: Number(process.env.YOUTUBE_POLL_MS || 3000),
+  });
+  yt.on('waiting', () => console.log('[youtube] 진행 중인 방송 없음 — 15초 후 다시 확인'));
+  yt.on('broadcast', (b) => console.log('[youtube] 방송 발견:', b.title));
+  yt.on('ready', (r) => console.log(`✔ 유튜브 채팅 연결됨 (이전 메시지 ${r.skipped}개 무시)`));
+  yt.on('ended', () => console.log('[youtube] 방송 종료 — 다음 방송 대기'));
+  yt.on('error', (e) => console.error('[youtube]', e.message));
+  yt.on('donation', (d) => { console.log(`[youtube] 슈퍼챗 ${d.amountDisplay} ≈ ${d.payAmount}원`); handle('donation', d, 'youtube'); });
+  yt.on('subscription', (d) => handle('subscription', d, 'youtube'));
+  yt.on('chat', (d) => handle('chat', d, 'youtube'));
+  yt.start().catch((e) => console.error('[youtube]', e.message));
+}
+
 server.listen(port, async () => {
   console.log(`chzzk-souls-chaos 실행 중 — 프로필: ${profileName}, 백엔드: ${backendName}, 설정: ${configPath}`);
   if (backendName === 'cheatengine-lua') console.log(`브릿지 큐: ${backend.file} (Cheat Engine 에 ce/chaos-bridge.lua 가 설치되어 있어야 함 — npm run install-bridge)`);
@@ -108,6 +130,7 @@ server.listen(port, async () => {
   console.log('가짜 후원: npm run fake -- 5000 "말레니아" 닉네임');
   executor.init();
   await connectChzzk().catch((e) => console.error('[chzzk]', e.message));
+  await connectYouTube().catch((e) => console.error('[youtube]', e.message));
 });
 
 process.on('SIGINT', () => {

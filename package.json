@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node src/index.js",
     "auth": "node src/chzzk/auth.js",
+    "auth:youtube": "node tools/auth-youtube.js",
     "fake": "node tools/fake-donation.js",
     "keys": "node tools/list-effects.js",
     "install-bridge": "node tools/install-bridge.js",

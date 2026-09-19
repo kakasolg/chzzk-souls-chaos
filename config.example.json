@@ -123,5 +123,14 @@
       "streaming_channel_manager"
     ]
   },
-  "disabled": []
+  "disabled": [],
+  "youtube": {
+    "rates": {
+      "KRW": 1,
+      "USD": 1350,
+      "JPY": 9,
+      "EUR": 1450,
+      "GBP": 1700
+    }
+  }
 }

@@ -8,8 +8,9 @@
 
 ```
 치지직 Open API (DONATION / SUBSCRIPTION / CHAT)
-        │
-        ▼
+유튜브 라이브 (슈퍼챗 / 멤버십 / 채팅)  ─┐
+        │                              │
+        ▼                              ▼
   chzzk-souls-chaos  ── 금액·키워드 → 효과 결정 ── 파일 큐 ──▶  Cheat Engine (Lua 브릿지) + Hexinton 치트 테이블
         │                                                          (즉사 · 보스 소환 · 속도 · 텔레포트 · 무적 …)
         └── OBS 오버레이 (누가 뭘 쐈는지)
@@ -69,6 +70,21 @@ npm run auth
 
 브라우저에 치지직 로그인 창이 뜹니다. 스트리머 본인 계정으로 동의하면 `tokens.json`이 생성됩니다.
 (토큰은 자동 갱신됩니다. 이 파일도 외부에 공유하지 마세요.)
+
+### 3-b. 유튜브 라이브도 쓰려면 (선택)
+
+치지직 대신, 또는 같이 쓸 수 있습니다. 슈퍼챗 → 후원, 멤버십 가입 → 구독, 채팅 → `!fx` 명령으로 매핑됩니다.
+
+1. [Google Cloud 콘솔](https://console.cloud.google.com/) → 프로젝트 → **APIs & Services → Library** 에서 **YouTube Data API v3** Enable
+2. **OAuth consent screen**: External, 본인 이메일, **Test users 에 방송할 구글 계정 추가** (심사 불필요)
+3. **Credentials → Create credentials → OAuth client ID → Desktop app** → Client ID / Secret 을 `.env` 의 `YOUTUBE_CLIENT_ID/SECRET` 에
+4. ```bash
+   npm run auth:youtube
+   ```
+   구글 로그인 후 `youtube-tokens.json` 생성. 어댑터는 실행 시 **진행 중인 내 방송**을 자동으로 찾아 채팅을 읽습니다 (방송 전이면 15초마다 재확인).
+
+슈퍼챗 통화는 `config.json` 의 `youtube.rates` 로 원화 환산해 티어에 맞춥니다 (기본 USD 1,350원).
+쿼터: 채팅 폴링은 호출당 5, 기본 일일 쿼터 10,000 → 약 2.7시간. 긴 방송은 콘솔에서 쿼터 증설을 신청하거나 `YOUTUBE_POLL_MS` 를 늘리세요.
 
 ### 4. 게임 + Cheat Engine 실행
 
@@ -146,7 +162,8 @@ npm run fake -- chat "!fx Kill Player"           # 스트리머 채팅 명령
 
 ```
 src/
-├─ chzzk/        Open API — OAuth(auth.js), 세션/이벤트 구독(session.js)
+├─ chzzk/        치지직 Open API — OAuth(auth.js), 세션/이벤트 구독(session.js)
+├─ sources/      youtube.js — YouTube Data API 라이브 채팅 폴링 (슈퍼챗/멤버십/채팅)
 ├─ effects/      실행기(executor.js), 후원→효과 라우터(router.js)
 ├─ profiles/     효과 정의 — hexinton.json (기본), devpoland-hotkey.json (레거시 핫키 방식)
 ├─ backends/     cheatengine-lua (파일 큐 → CE Lua 브릿지) / cheatengine-hotkey / log
@@ -175,6 +192,8 @@ Elden Ring 1.17.1 (App 2.7.1) + Hexinton 8.0.4 + Cheat Engine 7.6 에서 실측:
 
 ## 로드맵
 
+- [x] 유튜브 라이브 소스
+- [ ] Streamlabs / StreamElements 소켓 소스 (유튜브 쿼터 우회)
 - [ ] 소환 ID 전수 확인 (스포너 HP 로 추정 가능)
 - [ ] 상태 이상 효과 (ApplyEffect SpEffect ID)
 - [ ] 다른 소울류(다크소울3, 세키로) 프로필

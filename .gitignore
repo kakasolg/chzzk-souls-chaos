@@ -1,6 +1,7 @@
 node_modules/
 .env
 tokens.json
+youtube-tokens.json
 config.json
 *.log
 vendor/
