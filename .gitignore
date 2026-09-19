@@ -5,3 +5,4 @@ youtube-tokens.json
 config.json
 *.log
 vendor/
+client/

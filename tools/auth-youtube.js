@@ -9,4 +9,4 @@ if (!client.id || !client.secret) {
 }
 await YouTubeSource.login(client, process.env.YOUTUBE_REDIRECT_URI || 'http://localhost:8081/callback');
 console.log('✔ 유튜브 연동 완료 — youtube-tokens.json 저장됨');
-process.exit(0);
+
