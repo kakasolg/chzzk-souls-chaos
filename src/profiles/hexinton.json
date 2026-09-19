@@ -1,0 +1,55 @@
+{
+  "$comment": "Hexinton All in One 8.0.x 치트 테이블 + ce/chaos-bridge.lua 용 프로필. 숫자는 치트 테이블 메모리 레코드 ID. 백엔드: cheatengine-lua",
+  "backend": "cheatengine-lua",
+  "defaultDuration": 30000,
+  "init": [
+    ["activate", 1987705401],
+    ["activate", 1987705402],
+    ["activate", 1987707202]
+  ],
+  "effects": {
+    "Kill Player":        { "label": "즉사",            "on": [["activate", 1337304928]] },
+    "One HP":             { "label": "체력 1",          "on": [["set", 1337192613, "1"]] },
+    "Half HP":            { "label": "체력 반토막",     "on": [["lua", "local r=chaosRec; r(1337192613).Value=tostring(math.floor(tonumber(r(1337192613).Value)/2))"]] },
+    "Heal HP":            { "label": "체력 회복",       "on": [["lua", "chaosRec(1337192613).Value=chaosRec(1337193290).Value"]] },
+    "No FP":              { "label": "FP 0",            "on": [["set", 1337192614, "0"]] },
+
+    "No Stamina":         { "label": "스태미나 0",      "on": [["freeze", 1337192615, "0"]], "off": [["unfreeze", 1337192615]] },
+    "Slow Motion":        { "label": "슬로우 모션",     "on": [["speed", "0.4"]], "off": [["speed", "1"]] },
+    "Double Time":        { "label": "2배속",           "on": [["speed", "2"]],   "off": [["speed", "1"]] },
+    "Pause Game":         { "label": "게임 정지",       "on": [["activate", 1337257998]], "off": [["deactivate", 1337257998]], "duration": 5000 },
+    "Ultra Zoom":         { "label": "초근접 줌",       "on": [["set", 1987707203, "0.45"]], "off": [["set", 1987707203, "1"]] },
+    "Quake Pro FOV":      { "label": "광각 FOV",        "on": [["set", 1987707203, "1.8"]],  "off": [["set", 1987707203, "1"]] },
+    "Aggro Everything":   { "label": "어그로 폭발",     "on": [["activate", 1337304934]], "off": [["deactivate", 1337304934]] },
+    "Teleport Random Grace": { "label": "랜덤 은총 이동", "on": [["lua", "local g={1042362951,10002958,12012951,12012954,12012956,12022953,12032953,12072951,14002950,15002952,15002955,15002957,16002952,30202950,31102950,31112950,32012950,32022950,32082950,35002953,1035452950}; chaosRec(1337304716).Value=tostring(g[math.random(#g)]); chaosRec(1337304717).Active=true"]] },
+
+    "Spawn Radahn":       { "label": "라단 소환",         "on": [["spawn", "c4730"]] },
+    "Spawn Malenia":      { "label": "말레니아 소환",     "on": [["spawn", "c4520"]] },
+    "Spawn Maliketh":     { "label": "말리케스 소환",     "on": [["spawn", "c2110"]] },
+    "Spawn Morgott":      { "label": "모르곳 소환",       "on": [["spawn", "c2130"]] },
+    "Spawn Godfrey":      { "label": "고드프리 소환",     "on": [["spawn", "c4720"]] },
+    "Spawn Mohg":         { "label": "모그 소환",         "on": [["spawn", "c4800"]] },
+    "Spawn Fire Giant":   { "label": "화염 거인 소환",    "on": [["spawn", "c4760"]] },
+    "Spawn Tree Sentinel":{ "label": "나무 파수꾼 소환",  "on": [["spawn", "c3251"]] },
+    "Spawn Crucible Knight": { "label": "도가니 기사 소환", "on": [["spawn", "c2500"]] },
+    "Spawn Black Knife":  { "label": "검은 칼 암살자 소환","on": [["spawn", "c2100"]] },
+    "Spawn Runebear":     { "label": "룬곰 소환",         "on": [["spawn", "c4630"]] },
+    "Spawn Giant Crab":   { "label": "거대 게 소환",      "on": [["spawn", "c2270"]] },
+    "Spawn Dragon":       { "label": "드래곤 소환",       "on": [["spawn", "c4500"]] },
+    "Spawn Death Rite Bird": { "label": "사영조 소환",    "on": [["spawn", "c4980"]] },
+    "Spawn Dog":          { "label": "개 소환",           "on": [["spawn", "c4160"]] },
+    "Spawn 3 Dogs":       { "label": "개 3마리",          "on": [["spawn", "c4160"], ["wait", 700], ["spawn", "c4160"], ["wait", 700], ["spawn", "c4160"]] },
+    "Spawn Rat":          { "label": "쥐 소환",           "on": [["spawn", "c4080"]] },
+    "Spawn 3 Rats":       { "label": "쥐 3마리",          "on": [["spawn", "c4080"], ["wait", 700], ["spawn", "c4080"], ["wait", 700], ["spawn", "c4080"]] },
+    "Spawn Warhawk":      { "label": "전투매 소환",       "on": [["spawn", "c4210"]] },
+    "Spawn Living Jar":   { "label": "살아있는 항아리",   "on": [["spawn", "c4491"]] },
+
+    "God Mode":           { "label": "무적 (보상)",       "on": [["activate", 1337304879]], "off": [["deactivate", 1337304879]] },
+    "One Hit Kill":       { "label": "한방컷 (보상)",     "on": [["activate", 1337257017]], "off": [["deactivate", 1337257017]] },
+    "Unlimited Stamina":  { "label": "무한 스태미나 (보상)", "on": [["activate", 1337304921]], "off": [["deactivate", 1337304921]] },
+    "Unlimited FP":       { "label": "무한 FP (보상)",    "on": [["activate", 1337304920]], "off": [["deactivate", 1337304920]] },
+    "Super Poise":        { "label": "슈퍼 강인도 (보상)", "on": [["activate", 1337256999]], "off": [["deactivate", 1337256999]] },
+    "Hide From Enemies":  { "label": "투명화 (보상)",     "on": [["activate", 1337256996]], "off": [["deactivate", 1337256996]] },
+    "No Hitbox":          { "label": "피격 무시 (보상)",  "on": [["activate", 1337251122]], "off": [["deactivate", 1337251122]] }
+  }
+}

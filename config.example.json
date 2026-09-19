@@ -1,21 +1,28 @@
 {
   "keywords": {
     "즉사": "Kill Player",
-    "말레니아": "SPAWN MALENIA",
-    "라단": "Spawn Promised Consort Radahn",
-    "드래곤": "SPAWN A DRAGON",
-    "힐": "Heal HP",
+    "말레니아": "Spawn Malenia",
+    "라단": "Spawn Radahn",
+    "말리케스": "Spawn Maliketh",
+    "모르곳": "Spawn Morgott",
+    "고드프리": "Spawn Godfrey",
+    "모그": "Spawn Mohg",
+    "드래곤": "Spawn Dragon",
+    "룬곰": "Spawn Runebear",
+    "개": "Spawn 3 Dogs",
+    "쥐": "Spawn 3 Rats",
+    "텔포": "Teleport Random Grace",
     "슬로우": "Slow Motion",
-    "거인": "Giant Player",
-    "소인": "Small Player"
+    "힐": "Heal HP",
+    "무적": "God Mode"
   },
   "tiers": [
-    { "min": 1000,  "pool": ["Slow Down", "Small Player", "Giant Player", "Paper Mario", "Ultra Zoom", "Aussie Simulator", "Spawn 3 Rats", "Spawn 3 Dogs", "Heal HP"] },
-    { "min": 3000,  "pool": ["Slow Motion", "Double Time", "No Stamina", "Random Weapon", "Bad PC", "Stop Moving", "TP Player to random NPC", "Spawn 3 Hawks", "SPAWN A GIANT RAT"] },
-    { "min": 5000,  "pool": ["Hitless Challenge", "Random Weapon Every Second", "Randomise All Stats", "TP all NPCs to Player", "SPAWN INVISIBLE ASSASIN", "SPAWN A DRAGON", "Teleport to random grace"] },
-    { "min": 10000, "pool": ["Kill Player", "SPAWN MALENIA", "Spawn Promised Consort Radahn", "Spawn Fake Promised Consort Radahn"] }
+    { "min": 1000,  "pool": ["Spawn Dog", "Spawn Rat", "Spawn Warhawk", "Spawn Living Jar", "Ultra Zoom", "Quake Pro FOV", "Half HP", "No FP", "Heal HP"] },
+    { "min": 3000,  "pool": ["Spawn 3 Dogs", "Spawn 3 Rats", "Slow Motion", "Double Time", "No Stamina", "Pause Game", "Spawn Giant Crab", "Spawn Black Knife", "Spawn Crucible Knight"] },
+    { "min": 5000,  "pool": ["One HP", "Aggro Everything", "Teleport Random Grace", "Spawn Tree Sentinel", "Spawn Runebear", "Spawn Dragon", "Spawn Death Rite Bird"] },
+    { "min": 10000, "pool": ["Kill Player", "Spawn Malenia", "Spawn Radahn", "Spawn Maliketh", "Spawn Morgott", "Spawn Godfrey", "Spawn Mohg", "Spawn Fire Giant"] }
   ],
-  "subscription": { "pool": ["Heal HP", "SPAWN A FRIENDLY DOG", "SPAWN A POT FRIEND"] },
+  "subscription": { "pool": ["Heal HP", "God Mode", "One Hit Kill", "Unlimited Stamina", "Unlimited FP", "Super Poise", "Hide From Enemies"] },
   "chatCommands": { "enabled": true, "prefix": "!", "roles": ["streamer", "streaming_channel_manager"] },
-  "disabled": ["Fake Crash"]
+  "disabled": []
 }

@@ -1,0 +1,767 @@
+{
+  "$comment": "devPoland Elden Ring Chaos Mod 의 CHAOS MOD.CT 글로벌 핫키 호환 프로필 (레거시). 백엔드: cheatengine-hotkey. 게임 창이 포커스여야 한다.",
+  "backend": "cheatengine-hotkey",
+  "defaultDuration": 30000,
+  "init": [
+    [
+      "key",
+      "numpad1"
+    ]
+  ],
+  "effects": {
+    "Ultra Speed": {
+      "label": "초고속",
+      "on": [
+        [
+          "key",
+          "F21"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F21"
+        ]
+      ]
+    },
+    "Hypersonic Speed": {
+      "label": "음속",
+      "on": [
+        [
+          "key",
+          "F21+1"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F21+1"
+        ]
+      ]
+    },
+    "Slow Down": {
+      "label": "느려짐",
+      "on": [
+        [
+          "key",
+          "F21+2"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F21+2"
+        ]
+      ]
+    },
+    "Stop Moving": {
+      "label": "이동 불가",
+      "on": [
+        [
+          "key",
+          "F21+3"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F21+3"
+        ]
+      ]
+    },
+    "Hitless Challenge": {
+      "label": "노히트 챌린지",
+      "every": [
+        [
+          "key",
+          "F24+1"
+        ]
+      ],
+      "interval": 1000,
+      "off": [
+        [
+          "key",
+          "F24+1"
+        ]
+      ]
+    },
+    "No Stamina": {
+      "label": "스태미나 0",
+      "every": [
+        [
+          "key",
+          "F15"
+        ]
+      ],
+      "interval": 200
+    },
+    "Heal HP": {
+      "label": "체력 회복",
+      "on": [
+        [
+          "key",
+          "F19+9"
+        ]
+      ]
+    },
+    "Kill Player": {
+      "label": "즉사",
+      "on": [
+        [
+          "key",
+          "F24+2"
+        ]
+      ]
+    },
+    "Laggy Player": {
+      "label": "렉 걸림",
+      "on": [
+        [
+          "key",
+          "F17"
+        ]
+      ]
+    },
+    "Slow Motion": {
+      "label": "슬로우 모션",
+      "on": [
+        [
+          "key",
+          "F18"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F18"
+        ]
+      ]
+    },
+    "Double Time": {
+      "label": "2배속",
+      "on": [
+        [
+          "key",
+          "F18+1"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F18+1"
+        ]
+      ]
+    },
+    "Fake Crash": {
+      "label": "가짜 크래시",
+      "on": [
+        [
+          "key",
+          "F18+2"
+        ],
+        [
+          "wait",
+          3500
+        ],
+        [
+          "key",
+          "F18+2"
+        ]
+      ]
+    },
+    "Bad PC": {
+      "label": "똥컴 시뮬레이터",
+      "every": [
+        [
+          "key",
+          "F18+2"
+        ],
+        [
+          "wait",
+          600
+        ],
+        [
+          "key",
+          "numpad7"
+        ]
+      ],
+      "interval": 2000,
+      "off": [
+        [
+          "key",
+          "numpad7"
+        ]
+      ]
+    },
+    "Teleport to random grace": {
+      "label": "랜덤 은총 이동",
+      "on": [
+        [
+          "key",
+          "F18+3"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F18+3"
+        ]
+      ],
+      "duration": 5000
+    },
+    "Play Random Cutscene": {
+      "label": "랜덤 컷신",
+      "on": [
+        [
+          "key",
+          "F19"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F19"
+        ]
+      ],
+      "duration": 5000
+    },
+    "Quake Pro FOV": {
+      "label": "퀘이크 FOV",
+      "on": [
+        [
+          "key",
+          "F20"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F20"
+        ]
+      ]
+    },
+    "Ultra Zoom": {
+      "label": "초근접 줌",
+      "on": [
+        [
+          "key",
+          "F20+1"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F20+1"
+        ]
+      ]
+    },
+    "Aussie Simulator": {
+      "label": "화면 뒤집기",
+      "on": [
+        [
+          "key",
+          "F20+2"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F20+2"
+        ]
+      ]
+    },
+    "Small Player": {
+      "label": "소인",
+      "on": [
+        [
+          "key",
+          "F22"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F22"
+        ]
+      ]
+    },
+    "Giant Player": {
+      "label": "거인",
+      "on": [
+        [
+          "key",
+          "F22+1"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F22+1"
+        ]
+      ]
+    },
+    "Paper Mario": {
+      "label": "종이 인간",
+      "on": [
+        [
+          "key",
+          "F22+2"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F22+2"
+        ]
+      ]
+    },
+    "Wide Player": {
+      "label": "와이드",
+      "on": [
+        [
+          "key",
+          "F22+3"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F22+3"
+        ]
+      ]
+    },
+    "Glitchy Player": {
+      "label": "글리치",
+      "on": [
+        [
+          "key",
+          "F22+4"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F22+4"
+        ]
+      ]
+    },
+    "Random Weapon": {
+      "label": "랜덤 무기",
+      "on": [
+        [
+          "key",
+          "F23"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F23"
+        ]
+      ]
+    },
+    "Random Weapon Every Second": {
+      "label": "매초 랜덤 무기",
+      "on": [
+        [
+          "key",
+          "F23+1"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F23+1"
+        ]
+      ]
+    },
+    "TP all NPCs to Player": {
+      "label": "NPC 전부 소환",
+      "on": [
+        [
+          "key",
+          "F14"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F14"
+        ]
+      ]
+    },
+    "TP Player to random NPC": {
+      "label": "랜덤 NPC 옆으로",
+      "on": [
+        [
+          "key",
+          "F14+1"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F14+1"
+        ]
+      ]
+    },
+    "-5 or +5 to random stat": {
+      "label": "랜덤 스탯 ±5",
+      "on": [
+        [
+          "key",
+          "F14+4"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F14+4"
+        ]
+      ]
+    },
+    "-5 or +5 to Vigor": {
+      "label": "생명력 ±5",
+      "on": [
+        [
+          "key",
+          "numpad3+1"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "numpad3+1"
+        ]
+      ],
+      "duration": 10000
+    },
+    "-5 or +5 to Mind": {
+      "label": "집중력 ±5",
+      "on": [
+        [
+          "key",
+          "numpad3+2"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "numpad3+2"
+        ]
+      ],
+      "duration": 10000
+    },
+    "-5 or +5 to Endurance": {
+      "label": "지구력 ±5",
+      "on": [
+        [
+          "key",
+          "numpad3+3"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "numpad3+3"
+        ]
+      ],
+      "duration": 10000
+    },
+    "-5 or +5 to Strength": {
+      "label": "근력 ±5",
+      "on": [
+        [
+          "key",
+          "numpad3+4"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "numpad3+4"
+        ]
+      ],
+      "duration": 10000
+    },
+    "-5 or +5 to Dexterity": {
+      "label": "기량 ±5",
+      "on": [
+        [
+          "key",
+          "numpad3+5"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "numpad3+5"
+        ]
+      ],
+      "duration": 10000
+    },
+    "-5 or +5 to Intelligence": {
+      "label": "지력 ±5",
+      "on": [
+        [
+          "key",
+          "numpad3+6"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "numpad3+6"
+        ]
+      ],
+      "duration": 10000
+    },
+    "-5 or +5 to Faith": {
+      "label": "신앙 ±5",
+      "on": [
+        [
+          "key",
+          "numpad3+7"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "numpad3+7"
+        ]
+      ],
+      "duration": 10000
+    },
+    "-5 or +5 to Arcane": {
+      "label": "신비 ±5",
+      "on": [
+        [
+          "key",
+          "numpad3+8"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "numpad3+8"
+        ]
+      ],
+      "duration": 10000
+    },
+    "Randomise All Stats": {
+      "label": "전체 스탯 랜덤",
+      "on": [
+        [
+          "key",
+          "numpad3"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "numpad3"
+        ]
+      ],
+      "duration": 10000
+    },
+    "GIVE RANDOM WEAPON": {
+      "label": "랜덤 무기 지급",
+      "on": [
+        [
+          "key",
+          "F13+1"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F13+1"
+        ]
+      ],
+      "duration": 3000
+    },
+    "GIVE RANDOM ARMOR": {
+      "label": "랜덤 방어구 지급",
+      "on": [
+        [
+          "key",
+          "F13+2"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F13+2"
+        ]
+      ],
+      "duration": 3000
+    },
+    "GIVE RANDOM TALISMAN": {
+      "label": "랜덤 탈리스만 지급",
+      "on": [
+        [
+          "key",
+          "F13+3"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F13+3"
+        ]
+      ],
+      "duration": 3000
+    },
+    "GIVE RANDOM ITEM": {
+      "label": "랜덤 아이템 지급",
+      "on": [
+        [
+          "key",
+          "F13+4"
+        ]
+      ],
+      "off": [
+        [
+          "key",
+          "F13+4"
+        ]
+      ],
+      "duration": 3000
+    },
+    "SPAWN A FRIENDLY DOG": {
+      "label": "아군 개 소환",
+      "on": [
+        [
+          "key",
+          "F16+1"
+        ]
+      ]
+    },
+    "SPAWN INVISIBLE ASSASIN": {
+      "label": "투명 암살자 소환",
+      "on": [
+        [
+          "key",
+          "F16+2"
+        ]
+      ]
+    },
+    "SPAWN MALENIA": {
+      "label": "말레니아 소환",
+      "on": [
+        [
+          "key",
+          "F16+3"
+        ]
+      ]
+    },
+    "Spawn Fake Promised Consort Radahn": {
+      "label": "가짜 라단 소환",
+      "on": [
+        [
+          "key",
+          "F16+4"
+        ]
+      ]
+    },
+    "Spawn Promised Consort Radahn": {
+      "label": "약속의 왕 라단 소환",
+      "on": [
+        [
+          "key",
+          "F16+5"
+        ]
+      ]
+    },
+    "Spawn 3 Hawks": {
+      "label": "매 3마리",
+      "on": [
+        [
+          "key",
+          "F16+6"
+        ]
+      ]
+    },
+    "Spawn 3 Rats": {
+      "label": "쥐 3마리",
+      "on": [
+        [
+          "key",
+          "F16+7"
+        ]
+      ]
+    },
+    "Spawn 3 Dogs": {
+      "label": "개 3마리",
+      "on": [
+        [
+          "key",
+          "F16+8"
+        ]
+      ]
+    },
+    "SPAWN A POT FRIEND": {
+      "label": "항아리 친구",
+      "on": [
+        [
+          "key",
+          "F16+9"
+        ]
+      ]
+    },
+    "SPAWN POTFRIEND GANG": {
+      "label": "항아리 갱단",
+      "on": [
+        [
+          "key",
+          "F16+0"
+        ]
+      ]
+    },
+    "SPAWN A FRIENDLY TICHE": {
+      "label": "아군 티셰",
+      "on": [
+        [
+          "key",
+          "F17+1"
+        ]
+      ]
+    },
+    "SPAWN A GIANT RAT": {
+      "label": "거대 쥐",
+      "on": [
+        [
+          "key",
+          "F17+2"
+        ]
+      ]
+    },
+    "SPAWN A FRIENDLY GIANT RAT": {
+      "label": "아군 거대 쥐",
+      "on": [
+        [
+          "key",
+          "F17+3"
+        ]
+      ]
+    },
+    "SPAWN A DRAGON": {
+      "label": "드래곤 소환",
+      "on": [
+        [
+          "key",
+          "F17+4"
+        ]
+      ]
+    },
+    "SPAWN A FRIENDLY DRAGON": {
+      "label": "아군 드래곤",
+      "on": [
+        [
+          "key",
+          "F17+5"
+        ]
+      ]
+    }
+  }
+}

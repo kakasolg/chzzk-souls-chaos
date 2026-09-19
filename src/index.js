@@ -4,7 +4,7 @@ import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer } from 'ws';
-import { createBackend } from './backends/cheatengine.js';
+import { createBackend } from './backends/index.js';
 import { EffectExecutor } from './effects/executor.js';
 import { Router } from './effects/router.js';
 import { ChzzkSession } from './chzzk/session.js';
@@ -13,12 +13,14 @@ import { loadTokens } from './chzzk/api.js';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const readJson = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
 
-const table = readJson(path.join(ROOT, 'src/effects/eldenring-chaosmod.json'));
+const profileName = process.env.PROFILE || 'hexinton';
+const table = readJson(path.join(ROOT, `src/profiles/${profileName}.json`));
 const configPath = fs.existsSync(path.join(ROOT, 'config.json')) ? 'config.json' : 'config.example.json';
 const config = readJson(path.join(ROOT, configPath));
 const port = Number(process.env.ADAPTER_PORT || 8008);
 
-const backend = createBackend(process.env.BACKEND || 'cheatengine');
+const backendName = process.env.BACKEND || table.backend || 'cheatengine-lua';
+const backend = createBackend(backendName);
 const executor = new EffectExecutor(table, backend);
 const router = new Router(config, executor.names());
 
@@ -100,7 +102,8 @@ async function connectChzzk() {
 }
 
 server.listen(port, async () => {
-  console.log(`chzzk-souls-chaos 실행 중 — 백엔드: ${process.env.BACKEND || 'cheatengine'}, 설정: ${configPath}`);
+  console.log(`chzzk-souls-chaos 실행 중 — 프로필: ${profileName}, 백엔드: ${backendName}, 설정: ${configPath}`);
+  if (backendName === 'cheatengine-lua') console.log(`브릿지 큐: ${backend.file} (Cheat Engine 에 ce/chaos-bridge.lua 가 설치되어 있어야 함 — npm run install-bridge)`);
   console.log(`OBS 브라우저 소스: http://localhost:${port}/overlay`);
   console.log('가짜 후원: npm run fake -- 5000 "말레니아" 닉네임');
   executor.init();
