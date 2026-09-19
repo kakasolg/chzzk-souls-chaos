@@ -13,7 +13,8 @@
     unfreeze <id>            고정 해제
     speed <x>                speedhack_setSpeed(x)
     spawn <chrId> [npcParam] Hexinton Character Spawner 로 캐릭터 스폰 (플레이어 위치)
-    lua <code>               임의 Lua 실행
+    lua <code>               임의 Lua 실행 (chaosRec(id), chaosLog(msg) 사용 가능)
+    read <id> [id ...]       레코드 값을 로그에 기록 (디버그)
     ping                     로그에 pong
 
   로그: %TEMP%\chzzk-souls-chaos\bridge.log  (CE Lua 엔진 창(Ctrl+Alt+L)에도 print)
@@ -38,9 +39,9 @@ local HEX = {
 
 os.execute('mkdir "' .. DIR .. '" 2>nul')
 
+-- print() 는 쓰지 않는다: CE 가 Lua Engine 창을 띄우면서 전체화면 게임의 포커스를 뺏는다.
 local function log(msg)
   local line = os.date('%H:%M:%S ') .. tostring(msg)
-  print('[chaos] ' .. line)
   local f = io.open(LOG, 'a')
   if f then f:write(line, '\n'); f:close() end
 end
@@ -52,6 +53,7 @@ local function rec(id)
   return r
 end
 chaosRec = rec  -- `lua` 명령에서 쓸 수 있도록 전역으로도 노출
+chaosLog = log
 
 local function spawn(chrId, npcParam)
   local num = tonumber(chrId:match('c(%d+)'))
@@ -76,6 +78,14 @@ local handlers = {
   speed      = function(x) speedhack_setSpeed(tonumber(x)) end,
   spawn      = spawn,
   lua        = function(code) assert(load(code))() end,
+  read       = function(...)
+    local out = {}
+    for _, id in ipairs({ ... }) do
+      local r = rec(id)
+      out[#out + 1] = r.Description .. '=' .. tostring(r.Value)
+    end
+    log('read ' .. table.concat(out, ' | '))
+  end,
 }
 
 local function execLine(line)
