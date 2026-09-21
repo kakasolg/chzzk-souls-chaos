@@ -19,6 +19,7 @@
     lua <code>               임의 Lua 실행 (chaosRec(id), chaosLog(msg) 사용 가능)
     read <id> [id ...]       레코드 값을 로그에 기록 (디버그)
     symbols                  테이블이 등록한 주요 심볼 주소를 symbols.json 에 기록 (외부 리더용)
+    warp <graceId>           해당 축복으로 워프 (Hexinton Choose Grace + Invoke Warp)
     ping                     로그에 pong
 
   로그: %TEMP%\chzzk-souls-chaos\bridge.log  (CE Lua 엔진 창(Ctrl+Alt+L)에도 print)
@@ -305,6 +306,7 @@ end
 local handlers = {
   setup      = function(...) setup(table.concat({ ... }, ' ')) end,
   symbols    = symbols,
+  warp       = function(id) rec(1337304716).Value = tostring(id); rec(1337304717).Active = true end,
   ping       = function() log('pong') end,
   activate   = function(id) rec(id).Active = true end,
   deactivate = function(id) rec(id).Active = false end,
