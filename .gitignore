@@ -10,4 +10,4 @@ bot/data/
 client/
 client_secret*.json
 __pycache__/
-bot/learn.out
+bot/*.out
