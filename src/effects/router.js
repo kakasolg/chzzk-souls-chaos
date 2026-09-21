@@ -57,15 +57,69 @@ export class Router {
     return effect ? { effect, reason: 'subscription' } : null;
   }
 
-  /** 스트리머/매니저가 채팅으로 직접 효과를 쏘는 테스트용 명령 (예: "!fx Kill Player") */
+  /** 효과가 속한 가장 낮은 티어 금액 (키워드 → 데모 후원 금액 계산용) */
+  tierMinOf(effect) {
+    const mins = this.tiers.filter((t) => this.#pool(t).includes(effect)).map((t) => t.min);
+    return mins.length ? Math.min(...mins) : null;
+  }
+
+  /**
+   * 채팅 명령.
+   *  - 스트리머/매니저: "!fx <효과 이름|키워드>" → 바로 발동 (chatCommands)
+   *  - 데모 모드(demo.enabled): 시청자 누구나
+   *      "!후원 <금액> [메시지]"  → 그 금액으로 후원한 것처럼 처리 (티어·키워드 동일)
+   *      "!<키워드>"              → 그 효과 티어의 최소 금액으로 후원한 것처럼
+   *      "!구독"                  → 구독 이벤트
+   *    시청자별 쿨다운(demo.cooldownMs, 기본 30초)과 금액 상한(demo.maxAmount, 기본 20000)
+   * 반환: { effect, reason } | { donation: {...} } | { subscription: {...} } | null
+   */
   forChat({ content, profile }) {
+    const prefix = this.cfg.chatCommands?.prefix ?? this.cfg.demo?.prefix ?? '!';
+    const text = (content ?? '').trim();
+    if (!text.startsWith(prefix)) return null;
+    const body = text.slice(prefix.length).trim();
+    const nickname = profile?.nickname ?? '?';
+
+    // 1) 스트리머 직접 발동
     const cc = this.cfg.chatCommands;
-    if (!cc?.enabled) return null;
-    const prefix = cc.prefix ?? '!';
-    if (!content.startsWith(prefix + 'fx ')) return null;
-    if (cc.roles?.length && !cc.roles.includes(profile?.userRoleCode)) return null;
-    const arg = content.slice(prefix.length + 3).trim();
-    const effect = this.cfg.keywords?.[arg] ?? this.all.find((n) => n.toLowerCase() === arg.toLowerCase());
-    return effect ? { effect, reason: 'chat' } : null;
+    if (cc?.enabled && body.startsWith('fx ')) {
+      if (cc.roles?.length && !cc.roles.includes(profile?.userRoleCode)) return null;
+      const arg = body.slice(3).trim();
+      const effect = this.cfg.keywords?.[arg] ?? this.all.find((n) => n.toLowerCase() === arg.toLowerCase());
+      return effect ? { effect, reason: 'chat' } : null;
+    }
+
+    // 2) 데모 모드 (시청자용 가짜 후원)
+    const demo = this.cfg.demo;
+    if (!demo?.enabled) return null;
+    const maxAmount = Number(demo.maxAmount ?? 20000);
+    const cooldown = Number(demo.cooldownMs ?? 30000);
+    this.demoLast ??= new Map();
+    const checkCooldown = () => {
+      const last = this.demoLast.get(nickname) ?? 0;
+      if (Date.now() - last < cooldown) return false;
+      this.demoLast.set(nickname, Date.now());
+      return true;
+    };
+
+    if (body === '구독' || body === 'sub') {
+      if (!checkCooldown()) return { cooldown: true, nickname };
+      return { subscription: { subscriberNickname: nickname, tierName: 'demo', month: 1 }, reason: 'demo' };
+    }
+    const m = /^(후원|도네|donate)\s+(\d+)\s*(.*)$/.exec(body);
+    if (m) {
+      if (!checkCooldown()) return { cooldown: true, nickname };
+      const amount = Math.min(Number(m[2]), maxAmount);
+      return { donation: { donatorNickname: nickname, payAmount: String(amount), donationText: m[3] ?? '' }, reason: 'demo' };
+    }
+    const kw = Object.keys(this.cfg.keywords ?? {}).find((k) => k === body);
+    if (kw) {
+      const effect = this.cfg.keywords[kw];
+      const min = this.tierMinOf(effect);
+      if (min == null) return null;
+      if (!checkCooldown()) return { cooldown: true, nickname };
+      return { donation: { donatorNickname: nickname, payAmount: String(Math.min(min, maxAmount)), donationText: kw }, reason: 'demo' };
+    }
+    return null;
   }
 }

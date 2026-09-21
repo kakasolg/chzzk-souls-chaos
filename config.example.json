@@ -131,6 +131,11 @@
       "streaming_channel_manager"
     ]
   },
+  "demo": {
+    "enabled": false,
+    "cooldownMs": 30000,
+    "maxAmount": 20000
+  },
   "disabled": [
     "Ally Wolf",
     "Ally Black Knife",

@@ -85,9 +85,14 @@ function handle(kind, data, source) {
     by = data.subscriberNickname;
     console.log(`⭐ ${by} 구독 ${data.month}개월 → ${pick?.effect ?? '(무시)'}`);
   } else if (kind === 'chat') {
-    pick = router.forChat(data);
+    const r = router.forChat(data);
     by = data.profile?.nickname;
-    if (pick) console.log(`💬 ${by}: ${data.content} → ${pick.effect}`);
+    if (!r) return;
+    if (r.cooldown) return console.log(`🕒 ${by}: 데모 쿨다운 중 (무시)`);
+    if (r.donation) { console.log(`🎭 ${by}: "${data.content}" → 데모 후원 ${r.donation.payAmount}원`); return handle('donation', r.donation, source + ':demo'); }
+    if (r.subscription) { console.log(`🎭 ${by}: "${data.content}" → 데모 구독`); return handle('subscription', r.subscription, source + ':demo'); }
+    pick = r;
+    console.log(`💬 ${by}: ${data.content} → ${pick.effect}`);
   }
   if (pick) executor.trigger(pick.effect, { by, amount, source, reason: pick.reason });
 }
