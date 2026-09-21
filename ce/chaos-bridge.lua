@@ -43,7 +43,8 @@ local HEX = {
 
 os.execute('mkdir "' .. DIR .. '" 2>nul')
 
--- print() 는 쓰지 않는다: CE 가 Lua Engine 창을 띄우면서 전체화면 게임의 포커스를 뺏는다.
+-- print() 는 쓰지 않는다: CE 가 Lua Engine 창을 띄우면서 게임의 포커스를 뺏는다.
+-- 테이블 자체 스크립트들도 print 로 에러를 뿜으며 같은 문제를 일으키므로, CE 전역 print 를 파일 로그로 돌린다.
 local function log(msg)
   local line = os.date('%H:%M:%S ') .. tostring(msg)
   local f = io.open(LOG, 'a')
@@ -58,6 +59,12 @@ local function rec(id)
 end
 chaosRec = rec  -- `lua` 명령에서 쓸 수 있도록 전역으로도 노출
 chaosLog = log
+if not chaosOrigPrint then chaosOrigPrint = print end
+print = function(...)
+  local parts = {}
+  for i = 1, select('#', ...) do parts[#parts + 1] = tostring(select(i, ...)) end
+  log('[ce print] ' .. table.concat(parts, '	'))
+end
 
 -- 플레이어가 죽거나 맵을 다시 불러오면 스포너 훅이 끊긴다(스크립트는 켜져 보여도 소환 안 됨).
 -- 그래서 스폰 후 SpawnedEnemy 포인터가 안 바뀌면 스포너를 껐다 켜고 한 번 더 시도한다.
