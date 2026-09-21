@@ -5,7 +5,8 @@
 <title>chaos overlay</title>
 <style>
   body { margin: 0; background: transparent; font-family: "Malgun Gothic", sans-serif; color: #fff; }
-  #list { position: absolute; top: 16px; right: 16px; display: flex; flex-direction: column; gap: 8px; width: 360px; }
+  #list { position: absolute; top: 56px; right: 16px; display: flex; flex-direction: column; gap: 8px; width: 360px; }
+  #queue { position: absolute; top: 16px; right: 16px; width: 360px; font-size: 16px; opacity: .9; text-shadow: 0 1px 2px #000; text-align: right; }
   .fx { background: rgba(0,0,0,.65); border-left: 6px solid #e8b04b; padding: 10px 14px; border-radius: 6px;
         text-shadow: 0 1px 2px #000; animation: in .3s ease-out; }
   .fx.end { opacity: .35; border-color: #666; }
@@ -15,6 +16,7 @@
 </style>
 </head>
 <body>
+<div id="queue"></div>
 <div id="list"></div>
 <script>
   const list = document.getElementById('list');
@@ -24,6 +26,10 @@
     ws.onmessage = (e) => {
       const m = JSON.parse(e.data);
       const key = m.name + '|' + (m.by || '');
+      if (m.type === 'queued' || m.type === 'start') {
+        const n = m.pending ?? 0;
+        document.getElementById('queue').textContent = n > 0 ? '⏳ 대기 중 ' + n + '개' : '';
+      }
       if (m.type === 'start') {
         const d = document.createElement('div');
         d.className = 'fx';

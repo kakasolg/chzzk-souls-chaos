@@ -22,7 +22,10 @@ const port = Number(process.env.ADAPTER_PORT || 8008);
 
 const backendName = process.env.BACKEND || table.backend || 'cheatengine-lua';
 const backend = createBackend(backendName);
-const executor = new EffectExecutor(table, backend);
+const executor = new EffectExecutor(table, backend, {
+  gapMs: Number(config.queue?.gapMs ?? 8000),
+  maxPending: Number(config.queue?.maxPending ?? 20),
+});
 const router = new Router(config, executor.names());
 
 // ── 오버레이 / 가짜 이벤트 주입용 로컬 서버 ──
@@ -62,6 +65,11 @@ executor.on('start', (e) => {
   broadcast({ type: 'start', ...e });
 });
 executor.on('end', (e) => broadcast({ type: 'end', ...e }));
+executor.on('queued', (e) => {
+  if (e.position > 0) console.log(`⏳ ${e.label} 대기 ${e.position}번째 ← ${e.by ?? '?'}`);
+  broadcast({ type: 'queued', ...e });
+});
+executor.on('dropped', (e) => { console.warn(`✖ ${e.label} 버림 (대기열 가득) ← ${e.by ?? '?'}`); broadcast({ type: 'dropped', ...e }); });
 executor.on('unknown', (n) => console.warn('알 수 없는 효과:', n));
 
 // ── 이벤트 → 효과 ──

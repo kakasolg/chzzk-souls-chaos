@@ -116,25 +116,29 @@ OBS에 **브라우저 소스** `http://localhost:8008/overlay` (1920×1080)를 �
 
 ```jsonc
 {
+  // 효과는 대기열에 들어가 8초 간격으로 하나씩 시작 (후원이 몰려도 스트리머가 감당 가능). 20개 넘게 밀리면 버림
+  "queue": { "gapMs": 8000, "maxPending": 20 },
+
   // 후원 메시지에 이 단어가 있으면 해당 효과 (금액이 그 효과의 티어 이상일 때만)
   "keywords": { "즉사": "Kill Player", "쥐": "Rat Pack", "박쥐": "Bat Swarm", "말레니아": "Spawn Malenia" },
 
   // 금액 구간별 랜덤 풀. 키워드 없으면 금액에 맞는 가장 높은 구간에서 랜덤
   "tiers": [
-    { "min": 1000,  "pool": ["Bat", "Warhawk", "Rat", "Wolf", "Ultra Zoom"] },
-    { "min": 3000,  "pool": ["Bat Swarm", "Rat Pack", "Wolf Pack", "Fingercreepers", "Slow Motion"] },
-    { "min": 5000,  "pool": ["Basilisk", "Demi-Human Gang", "One HP", "Teleport Random Grace"] },
-    { "min": 20000, "pool": ["Kill Player", "Spawn Malenia", "Spawn Radahn"] }
+    { "min": 1000,  "pool": ["Bat", "Dragonflies", "Rat", "Dog", "Ultra Zoom"] },          // 성가심
+    { "min": 3000,  "pool": ["Bat Swarm", "Rat Pack", "Wolf Pack", "Fingercreepers"] },      // 떼
+    { "min": 5000,  "pool": ["Basilisk", "Demi-Human Gang", "One HP", "Teleport Random Grace"] }, // 위협
+    { "min": 10000, "pool": ["Crucible Knight", "Tree Sentinel", "Kill Player"] },           // 엘리트
+    { "min": 20000, "pool": ["Spawn Malenia", "Spawn Radahn"] }                              // 보스
   ],
 
-  // 구독 시 효과 (보통 이로운 것)
-  "subscription": { "pool": ["Heal HP", "God Mode", "One Hit Kill"] },
+  // 구독 시 효과 — 기본은 멜리나 동반자 (안 싸우는 영체, 밸런스 안 깨짐)
+  "subscription": { "pool": ["Ally Melina"] },
 
   // 스트리머/매니저가 채팅으로 직접 발동: "!fx Kill Player" 또는 "!fx 즉사"
   "chatCommands": { "enabled": true, "prefix": "!", "roles": ["streamer", "streaming_channel_manager"] },
 
-  // 아예 쓰지 않을 효과
-  "disabled": ["Pause Game"]
+  // 아예 쓰지 않을 효과 (기본: 너무 강한 전투 영체들)
+  "disabled": ["Ally Wolf", "Ally Malenia"]
 }
 ```
 

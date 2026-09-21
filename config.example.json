@@ -1,48 +1,59 @@
 {
+  "$comment": "티어: 1,000 성가심 / 3,000 떼 / 5,000 위협 / 10,000 엘리트 / 20,000 보스. 키워드는 금액이 그 효과의 티어 이상일 때만 지목됨. queue: 효과 시작 간격(ms)과 최대 대기 수",
+  "queue": {
+    "gapMs": 8000,
+    "maxPending": 20
+  },
   "keywords": {
     "즉사": "Kill Player",
+    "텔포": "Teleport Random Grace",
+    "슬로우": "Slow Motion",
+    "힐": "Heal HP",
+    "정지": "Pause Game",
+    "박쥐": "Bat Swarm",
+    "잠자리": "Dragonflies",
+    "독수리": "Eagle",
+    "해파리": "Jellyfish",
+    "쥐": "Rat Pack",
+    "늑대": "Wolf Pack",
+    "개": "Dog Pack",
+    "손가락": "Fingercreepers",
+    "매": "Warhawks",
+    "해골": "Skeletons",
+    "바실리스크": "Basilisk",
+    "반인": "Demi-Human Gang",
+    "문어": "Land Octopus",
+    "슬라임": "Rot Slime",
+    "블러드하운드": "Bloodhound Knight",
+    "암살자": "Black Knife",
+    "도가니": "Crucible Knight",
+    "파수꾼": "Tree Sentinel",
+    "룬곰": "Runebear",
+    "사영조": "Death Rite Bird",
+    "게": "Giant Crab",
     "말레니아": "Spawn Malenia",
     "라단": "Spawn Radahn",
     "말리케스": "Spawn Maliketh",
     "모르곳": "Spawn Morgott",
     "고드프리": "Spawn Godfrey",
     "모그": "Spawn Mohg",
+    "화염거인": "Spawn Fire Giant",
     "용": "Spawn Dragon",
     "번개용": "Spawn Lightning Dragon",
     "아스텔": "Spawn Astel",
-    "박쥐": "Bat Swarm",
-    "매": "Warhawks",
-    "벌레": "Giant Insect",
-    "잠자리": "Dragonflies",
-    "손가락": "Fingercreepers",
-    "쥐": "Rat Pack",
-    "늑대": "Wolf Pack",
-    "개": "Dog Pack",
-    "바실리스크": "Basilisk",
-    "해골": "Skeletons",
-    "반인": "Demi-Human Gang",
-    "텔포": "Teleport Random Grace",
-    "슬로우": "Slow Motion",
-    "힐": "Heal HP",
-    "무적": "God Mode",
-    "영체": "Ally Wolf",
-    "멜리나": "Ally Melina",
-    "아군말레니아": "Ally Malenia",
-    "아군라단": "Ally Radahn"
+    "영체": "Ally Dog",
+    "멜리나": "Ally Melina"
   },
   "tiers": [
     {
       "min": 1000,
       "pool": [
         "Bat",
-        "Warhawk",
         "Dragonflies",
         "Eagle",
         "Jellyfish",
         "Rat",
-        "Wolf",
         "Dog",
-        "Giant Insect",
         "Ultra Zoom",
         "Quake Pro FOV",
         "Half HP",
@@ -53,19 +64,16 @@
       "min": 3000,
       "pool": [
         "Bat Swarm",
-        "Warhawks",
-        "Fingercreepers",
         "Rat Pack",
         "Big Rats",
         "Wolf Pack",
         "Dog Pack",
-        "Rot Slime",
-        "Land Octopus",
+        "Fingercreepers",
+        "Warhawks",
         "Skeletons",
         "Slow Motion",
         "Double Time",
-        "No Stamina",
-        "Operatic Bat"
+        "No Stamina"
       ]
     },
     {
@@ -74,6 +82,8 @@
         "Basilisk",
         "Demi-Human Gang",
         "Big Fingercreeper",
+        "Land Octopus",
+        "Rot Slime",
         "Bloodhound Knight",
         "Black Knife",
         "One HP",
@@ -85,9 +95,10 @@
       "min": 10000,
       "pool": [
         "Crucible Knight",
-        "Runebear",
         "Tree Sentinel",
+        "Runebear",
         "Death Rite Bird",
+        "Giant Crab",
         "Kill Player"
       ]
     },
@@ -105,28 +116,11 @@
         "Spawn Lightning Dragon",
         "Spawn Astel"
       ]
-    },
-    {
-      "min": 30000,
-      "pool": [
-        "Ally Malenia",
-        "Ally Radahn",
-        "Ally Dragon",
-        "Ally Runebear"
-      ]
     }
   ],
   "subscription": {
     "pool": [
-      "Ally Wolf",
-      "Ally Dog",
-      "Ally Black Knife",
-      "Ally Crucible Knight",
-      "Ally Tree Sentinel",
-      "Ally Melina",
-      "God Mode",
-      "One Hit Kill",
-      "Heal HP"
+      "Ally Melina"
     ]
   },
   "chatCommands": {
@@ -137,7 +131,20 @@
       "streaming_channel_manager"
     ]
   },
-  "disabled": [],
+  "disabled": [
+    "Ally Wolf",
+    "Ally Black Knife",
+    "Ally Crucible Knight",
+    "Ally Tree Sentinel",
+    "Ally Runebear",
+    "Ally Dragon",
+    "Ally Malenia",
+    "Ally Radahn",
+    "Operatic Bat",
+    "Giant Insect",
+    "Warhawk",
+    "Wolf"
+  ],
   "youtube": {
     "rates": {
       "KRW": 1,
