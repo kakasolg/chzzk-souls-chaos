@@ -9,7 +9,7 @@
 | | |
 |---|---|
 | 지원 플랫폼 | **치지직** (치즈 후원 · 구독 · 채팅), **유튜브 라이브** (슈퍼챗 · 멤버십 · 채팅) — 둘 다 동시 사용 가능 |
-| 게임 | Elden Ring (Steam) — Shadow of the Erdtree 포함 최신 버전에서 검증 |
+| 게임 | Elden Ring (Steam) — **1.17.1 + Shadow of the Erdtree** 에서 검증 (Cheat Engine 7.6, Hexinton 8.0.4). 상세: [검증 환경 / 미검증 목록](docs/DEVELOPMENT.md#검증-환경) |
 | 필요한 것 | Cheat Engine + Nexus의 [Hexinton All in One 치트 테이블](https://www.nexusmods.com/eldenring/mods/48) + Node.js |
 | 방송 화면 | OBS 브라우저 소스로 "누가 뭘 쐈는지" 오버레이 표시 |
 
