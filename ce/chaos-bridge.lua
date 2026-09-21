@@ -66,7 +66,9 @@ local function spawnerRetoggle()
   rec(HEX.spawnerInner).Active = true
 end
 
-local function spawnOnce(chrId, npcParam)
+local HEX_SPAWN_X, HEX_SPAWN_Z = 1987705435, 1987705437
+
+local function spawnOnce(chrId, npcParam, offset)
   rec(HEX.spawner).Active = true
   rec(HEX.spawnerInner).Active = true
   rec(HEX.enemyType).Value = '0'
@@ -74,6 +76,14 @@ local function spawnOnce(chrId, npcParam)
   rec(HEX.npcParam).Value = tostring(npcParam)
   rec(HEX.npcThink).Value = tostring(npcParam)
   rec(HEX.printPos).Active = true   -- 현재 플레이어 좌표를 SpawnPos 에 복사
+  if offset and offset > 0 then
+    -- 플레이어 몸 위가 아니라 옆에 떨어뜨려 스폰 (아군은 팀 전환 전에 어그로가 잡히지 않도록)
+    local a = math.random() * 2 * math.pi
+    local x = tonumber(rec(HEX_SPAWN_X).Value) or 0
+    local z = tonumber(rec(HEX_SPAWN_Z).Value) or 0
+    rec(HEX_SPAWN_X).Value = tostring(x + math.cos(a) * offset)
+    rec(HEX_SPAWN_Z).Value = tostring(z + math.sin(a) * offset)
+  end
   rec(HEX.spawnDebug).Active = true
 end
 
@@ -83,14 +93,14 @@ local function spawnedPtr()
 end
 
 -- onDone(ptr|nil) 은 스폰이 확인되거나 포기했을 때 호출된다 (비동기)
-local function spawn(chrId, npcParam, onDone)
+local function spawn(chrId, npcParam, onDone, offset)
   local num = tonumber(chrId:match('c(%d+)'))
   npcParam = tonumber(npcParam) or (num * 10000)
   local prev = spawnedPtr()
-  spawnOnce(chrId, npcParam)
+  spawnOnce(chrId, npcParam, offset)
   local tries, retried = 0, false
   local t = createTimer(nil)
-  t.Interval = 100
+  t.Interval = 20
   t.OnTimer = function(tm)
     tries = tries + 1
     local p = spawnedPtr()
@@ -98,12 +108,12 @@ local function spawn(chrId, npcParam, onDone)
       tm.destroy()
       chaosLastSpawn = p
       if onDone then onDone(p) end
-    elseif tries == 12 and not retried then
+    elseif tries == 60 and not retried then
       retried = true
       log('spawn ' .. chrId .. ': not registered, re-toggling spawner')
       pcall(spawnerRetoggle)
-      pcall(spawnOnce, chrId, npcParam)
-    elseif tries > 40 then
+      pcall(spawnOnce, chrId, npcParam, offset)
+    elseif tries > 200 then
       tm.destroy()
       log('spawn ' .. chrId .. ': FAILED (no SpawnedEnemy after retry)')
       if onDone then onDone(nil) end
@@ -123,6 +133,24 @@ local HEX_RECRUIT_ALLY   = 1337320100
 local ALLY_TEAM = 47  -- Spirit Summon
 chaosAllies = chaosAllies or {}  -- 폴백으로 관리 중인 아군 { ptr, old, timer }
 
+-- 좌표 주소 (Hexinton Recruit 루틴과 동일한 경로): ChrIns → +190 → +68 → +70 (x,y,z), 그리고 havok 쪽 +A8 → +18 → +80
+local function chrPosAddrs(p)
+  local ok1, p1 = pcall(readQword, p + 0x190); if not ok1 or not p1 or p1 == 0 then return nil end
+  local ok2, p2 = pcall(readQword, p1 + 0x68); if not ok2 or not p2 or p2 == 0 then return nil end
+  local pos = p2 + 0x70
+  local ok3, p3 = pcall(readQword, p2 + 0xA8)
+  local ok4, p4 = ok3 and p3 and p3 ~= 0 and pcall(readQword, p3 + 0x18)
+  local pos2 = (ok4 and p4 and p4 ~= 0) and (p4 + 0x80) or nil
+  return pos, pos2
+end
+
+local function playerPos()
+  local base = '[[[[[WorldChrMan]+10EF8]+0]+190]+68]'
+  return readFloat(base .. '+70'), readFloat(base .. '+74'), readFloat(base .. '+78')
+end
+
+local FOLLOW_DIST = 9.0  -- 이보다 멀어지면 플레이어 옆으로 당겨온다 (멀어지면 게임이 개체를 정리해 버림)
+
 local function allyFallbackStart(p)
   local okOld, ob = pcall(readBytes, p + 0x6C, 1, true)
   local entry = { ptr = p, old = (okOld and ob and ob[1]) or 6 }
@@ -132,10 +160,24 @@ local function allyFallbackStart(p)
   t.OnTimer = function(tm)
     ticks = ticks + 1
     local okHp, hp = pcall(readInteger, '[[' .. string.format('%X', p) .. '+190]+0]+138')
-    if getOpenedProcessID() == 0 or ticks > 1200 or (okHp and hp and hp <= 0) then
+    if getOpenedProcessID() == 0 or ticks > 2400 or (okHp and hp and hp <= 0) then
       tm.destroy(); chaosAllies[p] = nil; return
     end
     pcall(writeBytes, p + 0x6C, ALLY_TEAM)
+    if ticks % 3 == 0 then  -- 1.5초마다 따라오기
+      pcall(function()
+        local pos, pos2 = chrPosAddrs(p)
+        if not pos then return end
+        local px, py, pz = playerPos()
+        local ax, ay, az = readFloat(pos), readFloat(pos + 4), readFloat(pos + 8)
+        local d = math.sqrt((px - ax) ^ 2 + (py - ay) ^ 2 + (pz - az) ^ 2)
+        if d > FOLLOW_DIST then
+          local nx, nz = px + 2.0, pz + 2.0
+          writeFloat(pos, nx); writeFloat(pos + 4, py); writeFloat(pos + 8, nz)
+          if pos2 then writeFloat(pos2, nx); writeFloat(pos2 + 4, py); writeFloat(pos2 + 8, nz) end
+        end
+      end)
+    end
   end
   entry.timer = t
   chaosAllies[p] = entry
@@ -165,7 +207,7 @@ local function ally(chrId, npcParam)
     local registered = allyRecruit(p)
     if not registered then allyFallbackStart(p) end
     log(('ally %s: %s'):format(chrId, registered and 'recruited (table)' or 'fallback reassert (no NoDead)'))
-  end)
+  end, 4.0)  -- 4m 옆에 스폰
 end
 
 chaosSpawn, chaosAlly = spawn, ally  -- `lua` 명령에서 디버그용

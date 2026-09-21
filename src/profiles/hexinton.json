@@ -1,5 +1,5 @@
 {
-  "$comment": "Hexinton All in One 8.0.x 치트 테이블 + ce/chaos-bridge.lua 용 프로필. 숫자는 치트 테이블 메모리 레코드 ID. 백엔드: cheatengine-lua. 주의: c4550(Monstrous Dog)은 게임 크래시, c2010(Blaidd) 등 NPC는 스포너로 안 나옴",
+  "$comment": "Hexinton All in One 8.0.x 치트 테이블 + ce/chaos-bridge.lua 용 프로필. 숫자는 치트 테이블 메모리 레코드 ID. 백엔드: cheatengine-lua. 주의: c4550(Monstrous Dog)은 게임 크래시, c2010(Blaidd)은 스포너로 안 나옴. 영체(ally)는 4m 옆에 스폰되어 따라다니며 싸움; 멜리나(c2180)는 따라오기만 함",
   "backend": "cheatengine-lua",
   "defaultDuration": 30000,
   "init": [
@@ -894,6 +894,24 @@
         [
           "ally",
           "c4730"
+        ]
+      ]
+    },
+    "Ally Melina": {
+      "label": "동반자: 멜리나",
+      "on": [
+        [
+          "ally",
+          "c2180"
+        ]
+      ]
+    },
+    "Ally Dog": {
+      "label": "영체: 개",
+      "on": [
+        [
+          "ally",
+          "c4160"
         ]
       ]
     }
