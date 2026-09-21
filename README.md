@@ -1,55 +1,63 @@
 # chzzk-souls-chaos
 
-치지직 **후원(치즈) · 구독 · 채팅**을 엘든링 카오스 효과로 연결하는 어댑터입니다.
-시청자가 치즈를 쏘면 스트리머 주변에 박쥐 떼가 날아들거나, 쥐 다섯 마리가 달려들거나, 슬로우 모션이 걸리거나, 즉사합니다.
+**시청자의 후원이 엘든링 안에서 일어나게 하는 도구**입니다.
+치지직 치즈 / 유튜브 슈퍼챗을 쏘면 스트리머 주변에 박쥐 떼가 날아들고, 쥐 다섯 마리가 달려들고, 슬로우 모션이 걸리고, 고액이면 말레니아가 소환됩니다. 구독하면 멜리나가 따라다닙니다.
 
 > 설계 원칙: **강한 보스 한 방보다, 날아다니고 물어뜯는 잔챙이가 슬슬 괴롭히는 게 훨씬 짜증난다.**
-> 그래서 소액 후원은 박쥐·매·잠자리·쥐·늑대·개 같은 성가신 무리, 고액만 보스로 잡혀 있습니다.
+> 그래서 소액은 박쥐·잠자리·쥐·늑대·개 같은 성가신 무리, 보스는 고액에만.
 
-```
-치지직 Open API (DONATION / SUBSCRIPTION / CHAT)
-유튜브 라이브 (슈퍼챗 / 멤버십 / 채팅)  ─┐
-        │                              │
-        ▼                              ▼
-  chzzk-souls-chaos  ── 금액·키워드 → 효과 결정 ── 파일 큐 ──▶  Cheat Engine (Lua 브릿지) + Hexinton 치트 테이블
-        │                                                          (즉사 · 보스 소환 · 속도 · 텔레포트 · 무적 …)
-        └── OBS 오버레이 (누가 뭘 쐈는지)
-```
+| | |
+|---|---|
+| 지원 플랫폼 | **치지직** (치즈 후원 · 구독 · 채팅), **유튜브 라이브** (슈퍼챗 · 멤버십 · 채팅) — 둘 다 동시 사용 가능 |
+| 게임 | Elden Ring (Steam) — Shadow of the Erdtree 포함 최신 버전에서 검증 |
+| 필요한 것 | Cheat Engine + Nexus의 [Hexinton All in One 치트 테이블](https://www.nexusmods.com/eldenring/mods/48) + Node.js |
+| 방송 화면 | OBS 브라우저 소스로 "누가 뭘 쐈는지" 오버레이 표시 |
 
-효과 자체는 Nexus의 [Hexinton All in One 치트 테이블](https://www.nexusmods.com/eldenring/mods/48)이 담당하고,
-이 프로젝트는 **치지직 이벤트를 그 테이블의 스크립트 on/off · 값 변경 명령으로 바꿔주는 역할**만 합니다.
-Cheat Engine 안에서 도는 작은 Lua 브릿지가 명령을 받아 실행하므로 **게임 창 포커스가 필요 없고**, 핫키 충돌도 없습니다.
-
-> ⚠️ **반드시 오프라인(EAC 비활성) 상태로 플레이하세요.** 온라인에서 메모리 조작 도구를 쓰면 밴됩니다.
-> 별도 세이브 슬롯/백업을 권장합니다. (`%APPDATA%\EldenRing\<스팀ID>\ER0000.sl2`)
+> ⚠️ **반드시 오프라인(EAC 비활성)으로 플레이하세요.** 온라인에서 메모리 조작 도구를 쓰면 밴됩니다.
+> 별도 세이브 슬롯을 쓰거나 세이브를 백업해 두세요: `%APPDATA%\EldenRing\<스팀ID>\ER0000.sl2`
 
 ---
 
-## 스트리머용 설치 가이드
+## 시청자에게는 이렇게 보입니다
+
+후원 금액에 따라 아래 단계에서 **랜덤**으로 하나가 발동됩니다. 후원 메시지에 **키워드**를 넣으면 그 효과를 지목할 수 있습니다 (지목한 효과의 단계 이상 금액일 때).
+
+| 단계 | 컨셉 | 효과 (키워드) |
+|---|---|---|
+| **1,000원** | 성가심 | 박쥐, 잠자리 떼 `잠자리`, 독수리 `독수리`, 해파리 `해파리`, 쥐, 개, 초근접 줌, 광각 FOV, 체력 반토막, FP 0 |
+| **3,000원** | 떼 | 박쥐 떼 `박쥐`, 쥐 떼 5마리 `쥐`, 큰 쥐 2마리, 늑대 무리 `늑대`, 개 3마리 `개`, 손가락 벌레 3마리 `손가락`, 전투매 2마리 `매`, 해골 3마리 `해골`, 슬로우 모션 `슬로우`, 2배속, 스태미나 0 |
+| **5,000원** | 위협 | 바실리스크(사혈) `바실리스크`, 반인 무리 `반인`, 거대 손가락 벌레, 육지 문어 `문어`, 부패 슬라임 `슬라임`, 블러드하운드 기사 `블러드하운드`, 검은 칼 암살자 `암살자`, 체력 1, 랜덤 은총 이동 `텔포`, 게임 정지 5초 `정지` |
+| **10,000원** | 엘리트 | 도가니 기사 `도가니`, 나무 파수꾼 `파수꾼`, 룬곰 `룬곰`, 사영조 `사영조`, 거대 게 `게`, **즉사** `즉사` |
+| **20,000원** | 보스 | 말레니아 `말레니아`, 라단 `라단`, 말리케스 `말리케스`, 모르곳 `모르곳`, 고드프리 `고드프리`, 모그 `모그`, 화염 거인 `화염거인`, 드래곤 `용`, 황금 번개 용 `번개용`, 아스텔 `아스텔` |
+| **구독 / 멤버십** | 보상 | **멜리나**가 영체로 소환되어 따라다닙니다 (축복에서 쉬면 사라짐) |
+
+- 후원이 몰리면 **8초 간격으로 하나씩** 발동됩니다 (오버레이에 "대기 중 N개" 표시).
+- 금액·단계·키워드는 전부 스트리머가 `config.json`에서 바꿀 수 있습니다.
+
+방송 설명란에 붙여 넣을 안내 예시:
+
+```
+🎮 치즈/슈퍼챗으로 게임에 개입하세요!
+1,000 성가신 잔챙이 · 3,000 떼거리 · 5,000 위협 · 10,000 엘리트/즉사 · 20,000 보스 소환
+메시지에 키워드를 쓰면 지목 가능: 쥐 / 박쥐 / 늑대 / 바실리스크 / 텔포 / 즉사 / 말레니아 …
+구독하면 멜리나가 옆에 따라다닙니다.
+```
+
+---
+
+## 설치 (스트리머, 약 20분)
 
 ### 준비물
 
 | 항목 | 비고 |
 |---|---|
-| Elden Ring (Steam) | EAC 끄고 오프라인 실행 |
-| [Cheat Engine](https://www.cheatengine.org/) 7.5+ | 공식 설치기는 번들 광고가 붙으니, `scoop install cheat-engine`(번들 없음, 7.6) 권장. 7.6 에서 검증됨 |
-| [Hexinton All in One](https://www.nexusmods.com/eldenring/mods/48) 8.0.x | Nexus 로그인 후 Manual download → zip 안의 `.CT` 파일 |
-| [Node.js](https://nodejs.org/) 20 이상 | |
-| 치지직 개발자센터 앱 | 아래 참고 |
+| Elden Ring (Steam) | 오프라인 실행 필요 (아래 참고) |
+| [Cheat Engine](https://www.cheatengine.org/) 7.5 이상 | 공식 설치기는 광고 번들이 붙습니다. [Scoop](https://scoop.sh/)이 있다면 `scoop bucket add extras && scoop install cheat-engine`(번들 없음) 권장 |
+| [Hexinton All in One](https://www.nexusmods.com/eldenring/mods/48) 8.0 이상 | Nexus 로그인 → Files → Manual download → zip 안의 `.CT` 파일을 아무 폴더에 |
+| [Node.js](https://nodejs.org/) 20 이상 | LTS 설치 |
+| 치지직 개발자센터 앱 또는 유튜브 OAuth 앱 | 아래 3단계 |
 
-### 1. 치지직 개발자센터에서 앱 등록
-
-https://developers.chzzk.naver.com → 애플리케이션 등록 (네이버 실명인증 계정 필요)
-
-| 항목 | 값 |
-|---|---|
-| 애플리케이션 ID / 이름 | 자유 (단 `chzzk`, `naver`, `치지직`, `네이버` 단어 포함 불가) |
-| 로그인 리디렉션 URL | `http://localhost:8080/callback` |
-| API Scope | **사용자 정보 조회, 채팅 메시지 조회, 후원 조회, 구독 조회** |
-
-발급된 Client ID / Client Secret을 메모합니다. (외부에 공유 금지)
-
-### 2. 어댑터 설치
+### 1. 어댑터 설치
 
 ```bash
 git clone https://github.com/kakasolg/chzzk-souls-chaos.git
@@ -57,163 +65,152 @@ cd chzzk-souls-chaos
 npm install
 copy .env.example .env
 copy config.example.json config.json
-npm run install-bridge        # Cheat Engine autorun 폴더에 Lua 브릿지 복사
+npm run install-bridge
 ```
 
-`.env`를 열어 Client ID / Secret을 넣습니다.
+마지막 명령은 Cheat Engine의 `autorun` 폴더에 작은 Lua 브릿지를 복사합니다 (CE가 켜질 때 자동 실행되어 어댑터의 명령을 받습니다).
 
-### 3. 치지직 계정 연동 (1회)
+### 2. `.env` 편집
 
-```bash
-npm run auth
+```ini
+HEXINTON_CT=C:\경로\eldenring_all-in-one_Hexinton-v8.0.4.CT   # 받은 치트 테이블
+CHZZK_CLIENT_ID=...        # 치지직을 쓰면 (3-a)
+CHZZK_CLIENT_SECRET=...
+YOUTUBE_CLIENT_ID=...      # 유튜브를 쓰면 (3-b)
+YOUTUBE_CLIENT_SECRET=...
 ```
 
-브라우저에 치지직 로그인 창이 뜹니다. 스트리머 본인 계정으로 동의하면 `tokens.json`이 생성됩니다.
-(토큰은 자동 갱신됩니다. 이 파일도 외부에 공유하지 마세요.)
+### 3-a. 치지직 연동
 
-### 3-b. 유튜브 라이브도 쓰려면 (선택)
+1. https://developers.chzzk.naver.com → **애플리케이션 등록** (네이버 실명인증 계정 필요)
 
-치지직 대신, 또는 같이 쓸 수 있습니다. 슈퍼챗 → 후원, 멤버십 가입 → 구독, 채팅 → `!fx` 명령으로 매핑됩니다.
+   | 항목 | 값 |
+   |---|---|
+   | 애플리케이션 ID / 이름 | 자유 — 단 `chzzk`, `naver`, `치지직`, `네이버` 단어는 포함 불가 |
+   | 로그인 리디렉션 URL | `http://localhost:8080/callback` |
+   | API Scope | **사용자 정보 조회, 채팅 메시지 조회, 후원 조회, 구독 조회** |
 
-1. [Google Cloud 콘솔](https://console.cloud.google.com/) → 프로젝트 → **APIs & Services → Library** 에서 **YouTube Data API v3** Enable
-2. **OAuth consent screen**: External, 본인 이메일, **Test users 에 방송할 구글 계정 추가** (심사 불필요)
-3. **Credentials → Create credentials → OAuth client ID → Desktop app** → Client ID / Secret 을 `.env` 의 `YOUTUBE_CLIENT_ID/SECRET` 에
-4. ```bash
+2. 발급된 Client ID / Secret을 `.env`에 넣고, 스트리머 계정으로 1회 로그인:
+   ```bash
+   npm run auth
+   ```
+   브라우저에서 동의하면 `tokens.json`이 생깁니다 (자동 갱신, 공유 금지).
+
+### 3-b. 유튜브 라이브 연동 (선택)
+
+슈퍼챗 → 후원, 멤버십 → 구독, 채팅 → 스트리머 명령으로 매핑됩니다.
+
+1. [Google Cloud 콘솔](https://console.cloud.google.com/) → 새 프로젝트
+2. **APIs & Services → Library** → **YouTube Data API v3** → Enable
+3. **OAuth consent screen** → External → 앱 이름·이메일 입력 → **Audience → Test users**에 방송할 구글 계정 추가
+4. **Credentials → Create credentials → OAuth client ID → Desktop app** → Client ID / Secret을 `.env`에
+5. 방송할 구글 계정으로 1회 로그인:
+   ```bash
    npm run auth:youtube
    ```
-   구글 로그인 후 `youtube-tokens.json` 생성. 어댑터는 실행 시 **진행 중인 내 방송**을 자동으로 찾아 채팅을 읽습니다 (방송 전이면 15초마다 재확인).
+   ("확인되지 않은 앱" 경고가 뜨면 → 고급 → 계속. 본인이 만든 앱이라 정상입니다.)
 
-슈퍼챗 통화는 `config.json` 의 `youtube.rates` 로 원화 환산해 티어에 맞춥니다 (기본 USD 1,350원).
+- 처음 라이브를 켜는 채널은 YouTube Studio에서 **라이브 스트리밍 활성화 후 24시간** 기다려야 합니다.
+- 슈퍼챗 통화는 `config.json`의 `youtube.rates`로 원화 환산됩니다 (기본 USD 1,350원).
+- 유튜브 채팅은 3~5초 지연이 있습니다 (폴링 API). 하루 쿼터 10,000 → 약 2.7시간 방송분. 긴 방송은 Google Cloud에서 쿼터 증설을 신청하거나 `.env`의 `YOUTUBE_POLL_MS`를 늘리세요.
+- 왜 스트리머마다 구글 설정이 필요한가: 유튜브 OAuth 앱은 만든 사람의 계정에 묶이고 공개하려면 구글 심사가 필요합니다. 각자 만들면 심사 없이 바로 쓰고 쿼터도 따로 받습니다.
 
-> 왜 스트리머마다 Google Cloud 설정이 필요한가: 유튜브 API 는 OAuth 앱이 구글 프로젝트 소유자에 묶이고, 앱을 공개하려면 구글 심사가 필요합니다.
-> 각자 앱을 만들면 심사 없이 바로 쓸 수 있고 일일 쿼터(10,000)도 스트리머별로 따로 받습니다.
-> 콘솔 설정이 부담스러우면 Streamlabs / StreamElements 소켓 소스(로드맵)가 대안입니다.
-쿼터: 채팅 폴링은 호출당 5, 기본 일일 쿼터 10,000 → 약 2.7시간. 긴 방송은 콘솔에서 쿼터 증설을 신청하거나 `YOUTUBE_POLL_MS` 를 늘리세요.
+---
 
-### 4. 게임 + Cheat Engine 실행
+## 방송 시작 순서 (매번)
 
-1. 엘든링을 **오프라인**으로 실행 (게임 폴더의 `start_game_in_offline_mode.exe`, 또는 EAC 프로세스 종료 후 `eldenring.exe` 직접 실행). **창 모드 권장** — 전체화면 전용은 포커스를 잃으면 최소화됩니다.
-2. `.env` 의 `HEXINTON_CT` 에 받은 `.CT` 경로를 넣고:
+1. **엘든링을 오프라인으로 실행** — 게임 폴더의 `start_game_in_offline_mode.exe`(Nexus의 오프라인 런처) 또는 EAC 프로세스를 끄고 `eldenring.exe` 직접 실행. **창 모드(또는 테두리 없는 창) 권장** — 전체화면 전용은 다른 창을 건드리면 최소화됩니다.
+2. 캐릭터를 로드한 뒤, 터미널에서:
    ```bash
    npm run attach
    ```
-   Cheat Engine 을 띄우고, 게임에 붙이고, 테이블을 불러오고, `[ Enable ]` 까지 자동으로 켭니다 (1분 정도, 팝업 없음).
-   수동으로 하려면: CE 실행 → `.CT` 열기 → 엘든링 프로세스 선택 → 맨 위 **[ Enable ]** 체크.
+   Cheat Engine을 띄우고, 게임에 붙이고, 치트 테이블을 불러와 `[ Enable ]`까지 켭니다 (1분 정도, 팝업 없음).
+3. 어댑터 실행:
+   ```bash
+   npm start
+   ```
+   ```
+   chzzk-souls-chaos 실행 중 — 프로필: hexinton, 백엔드: cheatengine-lua, 설정: config.json
+   OBS 브라우저 소스: http://localhost:8008/overlay
+   ✔ 치지직 세션 연결됨
+   ✔ 유튜브 채팅 연결됨
+   ```
+   유튜브는 **진행 중인 내 방송**을 자동으로 찾습니다 (방송 전이면 15초마다 재확인).
+4. OBS → 소스 추가 → **브라우저** → URL `http://localhost:8008/overlay`, 1920×1080. 발동된 효과와 대기 수가 우상단에 표시됩니다.
 
-### 5. 어댑터 실행
-
-```bash
-npm start
-```
-
-```
-chzzk-souls-chaos 실행 중 — 프로필: hexinton, 백엔드: cheatengine-lua, 설정: config.json
-OBS 브라우저 소스: http://localhost:8008/overlay
-✔ 치지직 세션 연결됨: ...
-```
-
-OBS에 **브라우저 소스** `http://localhost:8008/overlay` (1920×1080)를 추가하면 발동된 효과가 화면에 표시됩니다.
+방송 전 점검: 채팅에 `!fx Bat Swarm`을 쳐서 박쥐가 나오면 전부 정상입니다.
 
 ---
 
-## 효과 설정 (`config.json`)
+## 방송 중 운영
+
+- **스트리머/매니저 채팅 명령**: `!fx 효과이름` 또는 `!fx 키워드` (예: `!fx 즉사`, `!fx Rat Pack`). 방송 주인·관리자 계정만 먹습니다.
+- **대기열**: 효과는 8초 간격으로 하나씩 시작됩니다. 몰릴 때 오버레이에 "대기 중 N개". 20개 넘게 밀리면 버립니다.
+- **영체**: 구독 시 멜리나가 4m 옆에 나타나 따라다닙니다. 게임 영체처럼 축복 휴식·사망·지역 이동 시 사라집니다.
+- **죽었을 때**: 리스폰 후 소환이 잠깐 안 되는 경우가 있는데, 어댑터가 자동으로 감지해 스포너를 다시 켭니다.
+- **끝낼 때**: 어댑터 Ctrl+C → 게임은 메뉴에서 종료 → Cheat Engine 닫기 (테이블 저장 여부는 "아니오").
+
+---
+
+## 효과 설정 바꾸기 (`config.json`)
 
 ```jsonc
 {
-  // 효과는 대기열에 들어가 8초 간격으로 하나씩 시작 (후원이 몰려도 스트리머가 감당 가능). 20개 넘게 밀리면 버림
-  "queue": { "gapMs": 8000, "maxPending": 20 },
+  "queue": { "gapMs": 8000, "maxPending": 20 },        // 발동 간격(ms), 최대 대기 수
 
-  // 후원 메시지에 이 단어가 있으면 해당 효과 (금액이 그 효과의 티어 이상일 때만)
-  "keywords": { "즉사": "Kill Player", "쥐": "Rat Pack", "박쥐": "Bat Swarm", "말레니아": "Spawn Malenia" },
+  "keywords": { "즉사": "Kill Player", "쥐": "Rat Pack" },   // 메시지 키워드 → 효과
 
-  // 금액 구간별 랜덤 풀. 키워드 없으면 금액에 맞는 가장 높은 구간에서 랜덤
-  "tiers": [
-    { "min": 1000,  "pool": ["Bat", "Dragonflies", "Rat", "Dog", "Ultra Zoom"] },          // 성가심
-    { "min": 3000,  "pool": ["Bat Swarm", "Rat Pack", "Wolf Pack", "Fingercreepers"] },      // 떼
-    { "min": 5000,  "pool": ["Basilisk", "Demi-Human Gang", "One HP", "Teleport Random Grace"] }, // 위협
-    { "min": 10000, "pool": ["Crucible Knight", "Tree Sentinel", "Kill Player"] },           // 엘리트
-    { "min": 20000, "pool": ["Spawn Malenia", "Spawn Radahn"] }                              // 보스
+  "tiers": [                                             // 금액 구간별 랜덤 풀 (원)
+    { "min": 1000,  "pool": ["Bat", "Dragonflies", "Rat", "Dog", "Ultra Zoom"] },
+    { "min": 3000,  "pool": ["Bat Swarm", "Rat Pack", "Wolf Pack"] },
+    { "min": 5000,  "pool": ["Basilisk", "One HP", "Teleport Random Grace"] },
+    { "min": 10000, "pool": ["Crucible Knight", "Kill Player"] },
+    { "min": 20000, "pool": ["Spawn Malenia", "Spawn Radahn"] }
   ],
 
-  // 구독 시 효과 — 기본은 멜리나 동반자 (안 싸우는 영체, 밸런스 안 깨짐)
-  "subscription": { "pool": ["Ally Melina"] },
+  "subscription": { "pool": ["Ally Melina"] },           // 구독/멤버십 보상
 
-  // 스트리머/매니저가 채팅으로 직접 발동: "!fx Kill Player" 또는 "!fx 즉사"
   "chatCommands": { "enabled": true, "prefix": "!", "roles": ["streamer", "streaming_channel_manager"] },
 
-  // 아예 쓰지 않을 효과 (기본: 너무 강한 전투 영체들)
-  "disabled": ["Ally Wolf", "Ally Malenia"]
+  "disabled": ["Ally Wolf", "Ally Malenia"]              // 쓰지 않을 효과
 }
 ```
 
-전체 효과 목록은 `npm run keys`로 확인할 수 있습니다.
-효과 정의(프로필)는 [`src/profiles/hexinton.json`](src/profiles/hexinton.json)에 있으며, 지속시간(`duration`, 기본 30초)이나 명령을 바꾸거나 새 효과를 추가할 수 있습니다.
-숫자는 Hexinton 테이블의 메모리 레코드 ID입니다 (CE에서 항목 우클릭 → "Change script"/속성에서 확인).
+- 효과 이름 전체 목록: `npm run keys`
+- 싸우는 영체(늑대·기사·보스)도 준비돼 있지만 너무 강해서 기본은 꺼져 있습니다. 쓰려면 `disabled`에서 빼세요.
+- 효과 자체를 추가/수정하려면 [`src/profiles/hexinton.json`](src/profiles/hexinton.json)을 편집합니다. 숫자는 Hexinton 테이블의 레코드 ID입니다.
 
 ---
 
-## 게임/치지직 없이 테스트하기
+## 게임 없이 미리 테스트
 
-`.env`에서 `BACKEND=log`로 두면 명령을 보내지 않고 콘솔에만 출력합니다. Client ID가 없어도 실행됩니다.
+`.env`에 `BACKEND=log`를 두면 게임에 아무것도 보내지 않고 콘솔에만 찍습니다. Client ID 없이도 됩니다.
 
 ```bash
 npm start
 # 다른 터미널에서
-npm run fake -- 5000 "말레니아" 후원자닉        # 후원 5,000원
-npm run fake -- sub 구독자닉                     # 구독
-npm run fake -- chat "!fx Kill Player"           # 스트리머 채팅 명령
+npm run fake -- 5000 "말레니아" 후원자닉      # 후원 5,000원
+npm run fake -- sub 구독자닉                   # 구독
+npm run fake -- chat "!fx Kill Player"         # 스트리머 채팅 명령
 ```
 
 ---
 
-## 구조
+## 문제가 생기면
 
-```
-src/
-├─ chzzk/        치지직 Open API — OAuth(auth.js), 세션/이벤트 구독(session.js)
-├─ sources/      youtube.js — YouTube Data API 라이브 채팅 폴링 (슈퍼챗/멤버십/채팅)
-├─ effects/      실행기(executor.js), 후원→효과 라우터(router.js)
-├─ profiles/     효과 정의 — hexinton.json (기본), devpoland-hotkey.json (레거시 핫키 방식)
-├─ backends/     cheatengine-lua (파일 큐 → CE Lua 브릿지) / cheatengine-hotkey / log
-└─ overlay/      OBS 브라우저 소스
-ce/chaos-bridge.lua   Cheat Engine autorun 에 설치되는 브릿지 (명령: activate/deactivate/set/freeze/speed/spawn/ally/lua/setup)
-tools/
-├─ fake-donation.js   가짜 이벤트 주입
-├─ list-effects.js    효과 목록
-└─ install-bridge.js  브릿지를 CE autorun 폴더에 복사
-```
+| 증상 | 확인 |
+|---|---|
+| 효과가 아무것도 안 나옴 | `%TEMP%\chzzk-souls-chaos\bridge.log`에서 `FAIL` 줄 확인. `bridge ready`가 없으면 `npm run install-bridge` 후 CE 재시작 |
+| `npm run attach`가 "브릿지가 응답하지 않습니다" | Cheat Engine이 두 개 떠 있지 않은지 확인 (하나만). CE 창에 팝업이 떠 있으면 닫기 |
+| 소환은 되는데 나오지 않음 | 죽은 직후라면 몇 초 뒤 다시 시도됨. 계속 안 되면 CE에서 `[ Enable ]`을 껐다 켜기 |
+| 유튜브 "not enabled for live streaming" | 채널에서 라이브 활성화 후 24시간 대기 |
+| 유튜브 채팅이 안 잡힘 | 방송이 실제로 "라이브" 상태인지, 로그인한 계정이 방송 채널과 같은지 확인 |
+| 컨트롤러가 안 먹음 | 게임 창을 한 번 클릭 (포커스). Steam 밖에서 실행했다면 Steam 설정의 "Xbox 컨트롤러 Steam 입력"이 패드를 잡고 있을 수 있음 |
+| 게임이 크래시 | 일부 몹 ID는 게임을 죽입니다 (예: c4550). 새 효과를 추가할 때 먼저 `!fx`로 테스트하세요 |
 
-브릿지 로그: `%TEMP%\chzzk-souls-chaos\bridge.log` — 효과가 안 먹으면 여기서 `FAIL` 줄을 확인하세요.
-
-### 알려진 한계
-
-- 게임 상태를 읽지 않으므로 지속 효과의 해제는 시간 기반입니다.
-- 치트 테이블은 Hexinton 팀이 유지보수합니다. 엘든링 패치 후엔 테이블 업데이트를 기다려야 할 수 있고, 메모리 레코드 ID가 바뀌면 프로필의 ID를 맞춰야 합니다.
-- 레거시 `devpoland-hotkey` 프로필은 글로벌 핫키 방식이라 게임 창 포커스가 필요합니다.
-
-## 검증 상태
-
-Elden Ring 1.17.1 (App 2.7.1) + Hexinton 8.0.4 + Cheat Engine 7.6 에서 실측:
-즉사 · 체력 1/반토막/회복 · FP 0 · 스태미나 0 · 슬로우/2배속 · 초근접 줌/광각 FOV · 랜덤 은총 이동 · 캐릭터 소환(개, c4520, 라단) · 무적 등 보상 토글의 30초 자동 해제.
-말레니아는 `c2120`, `c4520` 은 황금 번개 용(별도 효과로 유지). 쥐 떼 5마리 동시 소환 확인.
-**유튜브 라이브 채팅 → 어댑터 → 게임 end-to-end 확인** (2026-09-20, 지연 3~5초는 유튜브 폴링 API 특성).
-**영체(아군) 소환 확인** — `ally` 명령: 플레이어 4m 옆에 스폰해 영체 팀(47)으로 편입. 황금빛으로 따라다니며 대신 싸웁니다(늑대가 쥐·병사를 잡는 것 확인). 멜리나(c2180)는 따라오기만 하는 동반자. 게임 영체처럼 **축복 휴식·리로드·사망으로 사라지면 끝** (재소환 없음, 최대 10분 유지). 구독 보상 기본값. `dismiss` 로 전부 해제.
-(처음엔 플레이어 몸 위에 스폰돼 팀 전환 전에 어그로가 잡혀 플레이어를 물었음 → 옆으로 떨어뜨려 해결.)
-**죽고 리스폰하면 스포너 훅이 끊기는 문제**는 브릿지가 자동 감지해 스포너를 껐다 켜고 재시도합니다.
-크래시: `c4550` Monstrous Dog 은 게임을 죽이므로 제외. NPC(c2010 Blaidd 등)는 스포너로 안 나옴.
-박쥐 떼(4마리) 등장도 확인. 아직 눈으로 확인 못 한 것: 게임 정지.
-
-## 로드맵
-
-- [x] 유튜브 라이브 소스
-- [ ] Streamlabs / StreamElements 소켓 소스 (유튜브 쿼터 우회)
-- [ ] 소환 ID 전수 확인 (스포너 HP 로 추정 가능)
-- [ ] 상태 이상 효과 (ApplyEffect SpEffect ID)
-- [ ] 다른 소울류(다크소울3, 세키로) 프로필
-- [ ] 효과 투표 모드 (채팅 1/2/3/4)
-- [ ] Nexus Mods 페이지
+---
 
 ## 라이선스
 
-MIT. 치트 테이블은 이 저장소에 포함되어 있지 않습니다 — [Hexinton All in One](https://www.nexusmods.com/eldenring/mods/48)(Nexus)에서 직접 받으세요.
-레거시 핫키 프로필은 [devPoland/EldenRingChaosMod](https://github.com/devPoland/EldenRingChaosMod)의 핫키 배치와만 호환하며 그 코드는 포함하지 않습니다.
+MIT. 치트 테이블은 포함되어 있지 않습니다 — [Hexinton All in One](https://www.nexusmods.com/eldenring/mods/48)(Nexus)에서 직접 받으세요.
+구조·실측 기록·로드맵은 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)에 있습니다.
