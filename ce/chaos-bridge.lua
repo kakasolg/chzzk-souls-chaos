@@ -13,7 +13,8 @@
     unfreeze <id>            고정 해제
     speed <x>                speedhack_setSpeed(x)
     spawn <chrId> [npcParam] Hexinton Character Spawner 로 캐릭터 스폰 (플레이어 위치)
-    ally <chrId> [npcParam]  스폰 후 아군(영체 팀 47)으로 편입 — 따라다니며 대신 싸움
+    ally <chrId> [npcParam] [초]  4m 옆에 스폰 후 영체 팀(47)으로 편입 — 따라다니며 대신 싸움. 기본 180초,
+                             휴식/리로드로 사라지면 다시 부름(최대 6회), 시간이 끝나면 해제
     dismiss                  아군 전부 해제(원래 팀으로)
     lua <code>               임의 Lua 실행 (chaosRec(id), chaosLog(msg) 사용 가능)
     read <id> [id ...]       레코드 값을 로그에 기록 (디버그)
@@ -128,8 +129,6 @@ end
 -- ── 알려진 한계 / 주의 ──────────────────────────────
 --  · 게임이 NPC 기본 팀으로 되돌리는 경우가 있어 팀 값은 한 번 쓰고 끝내면 안 된다 (되돌아간 채 불사면 죽일 수 없는 적).
 --    그래서 폴백에서는 NoDead 를 켜지 않고, 0.5초마다 팀을 재확인한다. `dismiss` 로 전부 원복.
-local HEX_TARGETED_ENEMY = 601372
-local HEX_RECRUIT_ALLY   = 1337320100
 local ALLY_TEAM = 47  -- Spirit Summon
 chaosAllies = chaosAllies or {}  -- 폴백으로 관리 중인 아군 { ptr, old, timer }
 
@@ -149,19 +148,45 @@ local function playerPos()
   return readFloat(base .. '+70'), readFloat(base .. '+74'), readFloat(base .. '+78')
 end
 
-local FOLLOW_DIST = 9.0  -- 이보다 멀어지면 플레이어 옆으로 당겨온다 (멀어지면 게임이 개체를 정리해 버림)
+local FOLLOW_DIST = 9.0      -- 이보다 멀어지면 플레이어 옆으로 당겨온다 (멀어지면 게임이 개체를 정리해 버림)
+local ALLY_LIFETIME = 180    -- 초. 영체 유지 시간 (ally 명령 3번째 인자로 바꿀 수 있음)
+local ALLY_RESPAWN_MAX = 6   -- 축복 휴식/리로드로 사라졌을 때 다시 불러오는 최대 횟수
 
-local function allyFallbackStart(p)
+-- 개체가 아직 살아있는 ChrIns 인지: HP/MaxHP 가 정상 범위여야 한다. 아니면 포인터가 무효(리로드로 정리됨).
+-- 무효한 포인터에 계속 쓰면 그 메모리를 재사용하는 다른 개체를 건드릴 수 있으므로 바로 손을 뗀다.
+local function allyAlive(p)
+  local okH, hp = pcall(readInteger, string.format('[[%X+190]+0]+138', p))
+  local okM, mx = pcall(readInteger, string.format('[[%X+190]+0]+13C', p))
+  if not (okH and okM and hp and mx) then return false end
+  return hp > 0 and mx > 0 and mx < 1000000 and hp <= mx
+end
+
+local allySummon  -- forward
+
+-- 한 영체 슬롯: 포인터가 무효해지면(휴식·리로드) 같은 몹을 다시 부르고, 수명이 끝나면 해제한다.
+local function allyFallbackStart(p, slot)
   local okOld, ob = pcall(readBytes, p + 0x6C, 1, true)
-  local entry = { ptr = p, old = (okOld and ob and ob[1]) or 6 }
+  slot.ptr, slot.old = p, (okOld and ob and ob[1]) or 6
   local t = createTimer(nil)
   t.Interval = 500
   local ticks = 0
   t.OnTimer = function(tm)
     ticks = ticks + 1
-    local okHp, hp = pcall(readInteger, '[[' .. string.format('%X', p) .. '+190]+0]+138')
-    if getOpenedProcessID() == 0 or ticks > 2400 or (okHp and hp and hp <= 0) then
-      tm.destroy(); chaosAllies[p] = nil; return
+    if getOpenedProcessID() == 0 or os.time() > slot.deadline then
+      tm.destroy(); chaosAllies[p] = nil
+      if getOpenedProcessID() ~= 0 and allyAlive(p) then pcall(writeBytes, p + 0x6C, slot.old) end
+      log('ally ' .. slot.chrId .. ': lifetime over')
+      return
+    end
+    if not allyAlive(p) then
+      tm.destroy(); chaosAllies[p] = nil
+      if ticks < 6 then return log('ally ' .. slot.chrId .. ': vanished right after spawn') end
+      if slot.respawns < ALLY_RESPAWN_MAX then
+        slot.respawns = slot.respawns + 1
+        log(('ally %s: vanished (rest/reload) — re-summoning %d/%d'):format(slot.chrId, slot.respawns, ALLY_RESPAWN_MAX))
+        allySummon(slot)
+      end
+      return
     end
     pcall(writeBytes, p + 0x6C, ALLY_TEAM)
     if ticks % 3 == 0 then  -- 1.5초마다 따라오기
@@ -179,35 +204,26 @@ local function allyFallbackStart(p)
       end)
     end
   end
-  entry.timer = t
-  chaosAllies[p] = entry
+  slot.timer = t
+  chaosAllies[p] = slot
   t.Enabled = true
 end
 
-local function allyRecruit(p)
-  -- 테이블 루틴은 락온 대상을 보므로 그 포인터를 잠시 스폰 개체로 바꿔치기한다
-  if not RecruitAlly_AddCurrentTarget then return false end
-  for _ = 1, 15 do
-    pcall(writeQword, 'LastLockOnTarget', p)
-    if GetPtr_3 then pcall(GetPtr_3) end
-    local ok, r1, retry = pcall(RecruitAlly_AddCurrentTarget, true)
-    if ok and r1 == true then return true end
-    if ok and retry == false then return false end
-    sleep(100)
-  end
-  return false
+allySummon = function(slot)
+  spawn(slot.chrId, slot.npcParam, function(p)
+    if not p then return log('ally ' .. slot.chrId .. ': spawn failed') end
+    pcall(writeBytes, p + 0x6C, ALLY_TEAM)
+    allyFallbackStart(p, slot)
+  end, 4.0)  -- 4m 옆에 스폰
 end
 
-local function ally(chrId, npcParam)
-  rec(HEX_TARGETED_ENEMY).Active = true
-  rec(HEX_RECRUIT_ALLY).Active = true
-  spawn(chrId, npcParam, function(p)
-    if not p then return log('ally ' .. chrId .. ': spawn failed') end
-    pcall(writeBytes, p + 0x6C, ALLY_TEAM)
-    local registered = allyRecruit(p)
-    if not registered then allyFallbackStart(p) end
-    log(('ally %s: %s'):format(chrId, registered and 'recruited (table)' or 'fallback reassert (no NoDead)'))
-  end, 4.0)  -- 4m 옆에 스폰
+-- 테이블의 Recruit 루틴은 리로드 뒤 옛 포인터를 계속 쓰므로 쓰지 않고 우리 슬롯 방식만 사용한다.
+local function ally(chrId, npcParam, seconds)
+  local num = tonumber(chrId:match('c(%d+)'))
+  npcParam = tonumber(npcParam) or (num * 10000)
+  local slot = { chrId = chrId, npcParam = npcParam, deadline = os.time() + (tonumber(seconds) or ALLY_LIFETIME), respawns = 0 }
+  allySummon(slot)
+  log(('ally %s: summoning for %ds'):format(chrId, slot.deadline - os.time()))
 end
 
 chaosSpawn, chaosAlly = spawn, ally  -- `lua` 명령에서 디버그용
@@ -215,11 +231,9 @@ chaosLastSpawn = nil
 
 -- 모든 아군 해제: 테이블 루틴 끄기(원복) + 폴백 아군 원래 팀으로
 local function dismiss()
-  local r = getAddressList().getMemoryRecordByID(HEX_RECRUIT_ALLY)
-  if r and r.Active then r.Active = false end
   for p, e in pairs(chaosAllies) do
     if e.timer then e.timer.destroy() end
-    pcall(writeBytes, p + 0x6C, e.old)
+    if allyAlive(p) then pcall(writeBytes, p + 0x6C, e.old) end
     chaosAllies[p] = nil
   end
   log('dismiss: allies released')
