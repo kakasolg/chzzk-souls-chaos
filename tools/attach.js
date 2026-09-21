@@ -72,3 +72,5 @@ if (/FAIL setup/.test(r)) {
   process.exit(1);
 }
 console.log('✔', r.split('\n').find((l) => l.includes('setup:')));
+// 외부 리더(bot/telemetry.py)용 심볼 주소 내보내기
+await send('symbols', /symbols written/, 10000);

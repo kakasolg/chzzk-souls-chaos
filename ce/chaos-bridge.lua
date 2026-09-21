@@ -18,6 +18,7 @@
     dismiss                  아군 전부 해제(원래 팀으로)
     lua <code>               임의 Lua 실행 (chaosRec(id), chaosLog(msg) 사용 가능)
     read <id> [id ...]       레코드 값을 로그에 기록 (디버그)
+    symbols                  테이블이 등록한 주요 심볼 주소를 symbols.json 에 기록 (외부 리더용)
     ping                     로그에 pong
 
   로그: %TEMP%\chzzk-souls-chaos\bridge.log  (CE Lua 엔진 창(Ctrl+Alt+L)에도 print)
@@ -249,6 +250,20 @@ end
 
 local ENABLE_ID = 1337092247  -- Hexinton [ Enable ]
 
+-- 테이블이 이 CE 보다 새 버전(CheatEngineTableVersion)으로 저장돼 있으면 CE 가 "newer version" 모달을 띄운다.
+-- 그 모달은 CE 내장이라 Lua 로 막을 수 없으므로, 임시 폴더에 버전 번호만 낮춘 사본을 만들어 그걸 연다.
+-- 원본은 건드리지 않고 재배포하지도 않는다.
+local function patchedTablePath(ctPath)
+  local f = io.open(ctPath, 'rb'); if not f then return ctPath end
+  local data = f:read('a'); f:close()
+  local patched, n = data:gsub('CheatEngineTableVersion="%d+"', 'CheatEngineTableVersion="40"', 1)
+  if n == 0 then return ctPath end
+  local out = DIR .. '\\table.patched.CT'
+  local w = io.open(out, 'wb'); if not w then return ctPath end
+  w:write(patched); w:close()
+  return out
+end
+
 local function setup(ctPath)
   if getOpenedProcessID() == 0 then
     openProcess('eldenring.exe')
@@ -256,7 +271,7 @@ local function setup(ctPath)
   end
   if getAddressList().Count == 0 then
     silenceDialogs()
-    loadTable(ctPath)
+    loadTable(patchedTablePath(ctPath))
   end
   local en = getAddressList().getMemoryRecordByID(ENABLE_ID)
   if not en then error('[ Enable ] not found — is this the Hexinton table?') end
@@ -264,8 +279,22 @@ local function setup(ctPath)
   log(('setup: pid=%d entries=%d enable=%s'):format(getOpenedProcessID(), getAddressList().Count, tostring(en.Active)))
 end
 
+-- 외부(Python) 리더가 테이블의 AOB 스캔 결과를 재사용할 수 있게 심볼 주소를 내보낸다
+local SYMBOLS = { 'WorldChrMan', 'GameDataMan', 'FieldArea', 'LocalPlayerOffset', 'SpawnedEnemy', 'LastLockOnTarget', 'WarpLocation' }
+local function symbols()
+  local out = { pid = getOpenedProcessID(), exe = getAddressSafe('eldenring.exe') }
+  for _, name in ipairs(SYMBOLS) do out[name] = getAddressSafe(name) end
+  local parts = {}
+  for k, v in pairs(out) do parts[#parts + 1] = ('"%s": %s'):format(k, v and ('"0x%X"'):format(v) or 'null') end
+  local f = assert(io.open(DIR .. '\\symbols.json', 'w'))
+  f:write('{' .. table.concat(parts, ', ') .. '}')
+  f:close()
+  log('symbols written: ' .. DIR .. '\\symbols.json')
+end
+
 local handlers = {
   setup      = function(...) setup(table.concat({ ... }, ' ')) end,
+  symbols    = symbols,
   ping       = function() log('pong') end,
   activate   = function(id) rec(id).Active = true end,
   deactivate = function(id) rec(id).Active = false end,
