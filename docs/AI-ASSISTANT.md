@@ -56,7 +56,7 @@ AI 가 없는 명령을 지어내거나 다른 프로그램 방식을 섞어 안
 | `src/profiles/hexinton.json` | 효과 정의 (고급 사용자용) |
 | `tokens.json`, `youtube-tokens.json` | 로그인 토큰. 자동 생성·갱신. 공유 금지 |
 | `ce/chaos-bridge.lua` | CE 브릿지 원본. `npm run install-bridge` 가 복사함 |
-| `%TEMP%\chzzk-souls-chaosridge.log` | 브릿지 로그. 효과가 안 나올 때 `FAIL` 줄 확인 |
+| `%TEMP%\chzzk-souls-chaos\bridge.log` | 브릿지 로그. 효과가 안 나올 때 `FAIL` 줄 확인 |
 | `docs/CHECKLIST.md` | 단계별 체크리스트 (이 순서대로) |
 
 ### `.env` 에 들어가는 키 (이것이 전부)
