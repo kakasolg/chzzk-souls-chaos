@@ -280,8 +280,11 @@ local function setup(ctPath)
 end
 
 -- 외부(Python) 리더가 테이블의 AOB 스캔 결과를 재사용할 수 있게 심볼 주소를 내보낸다
-local SYMBOLS = { 'WorldChrMan', 'GameDataMan', 'FieldArea', 'LocalPlayerOffset', 'SpawnedEnemy', 'LastLockOnTarget', 'WarpLocation' }
+local SYMBOLS = { 'WorldChrMan', 'GameDataMan', 'FieldArea', 'GameMan', 'LocalPlayerOffset', 'SpawnedEnemy', 'LastLockOnTarget', 'WarpLocation', 'camadr' }
+local HEX_CAM_SECTION = 1337199163  -- [ Teleport, Coords, NoClip/FreeCam ] — camadr(카메라 주소) 심볼을 등록하는 스크립트
 local function symbols()
+  -- 카메라 yaw 를 읽으려면 텔레포트/카메라 섹션 스크립트가 켜져 있어야 한다 (camadr 등록)
+  pcall(function() local r = getAddressList().getMemoryRecordByID(HEX_CAM_SECTION); if r and not r.Active then r.Active = true end end)
   local out = { pid = getOpenedProcessID(), exe = getAddressSafe('eldenring.exe') }
   for _, name in ipairs(SYMBOLS) do out[name] = getAddressSafe(name) end
   local parts = {}
