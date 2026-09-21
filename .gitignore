@@ -5,4 +5,7 @@ youtube-tokens*.json
 config.json
 *.log
 vendor/
+client/.venv/
+bot/data/
 client/
+client_secret*.json
