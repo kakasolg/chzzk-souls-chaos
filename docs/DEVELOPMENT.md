@@ -85,7 +85,7 @@ tools/
 | 단계 | 상태 |
 |---|---|
 | 1. 텔레메티리 포인터 + Recorder | ✅ 2026-09-21. `bot/telemetry.py`, `bot/record.py`. 브릿지 `symbols` 명령이 테이블의 AOB 결과를 내보내고 pymem 이 재사용 |
-| 2. 순찰 봇 (웨이포인트 + Guard, vgamepad) | 예정 |
+| 2. 순찰 봇 (웨이포인트 + Guard, vgamepad) | ✅ 2026-09-21. ViGEmBus 가상 패드, `nav.goto` 조향, `patrol.py` 왕복 순찰. 204 m 경로 무사 완주 |
 | 3. 플레이북 + 복기 + 롤백 | 예정 |
 
 ## 로드맵
