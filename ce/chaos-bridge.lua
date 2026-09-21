@@ -13,8 +13,8 @@
     unfreeze <id>            고정 해제
     speed <x>                speedhack_setSpeed(x)
     spawn <chrId> [npcParam] Hexinton Character Spawner 로 캐릭터 스폰 (플레이어 위치)
-    ally <chrId> [npcParam] [초]  4m 옆에 스폰 후 영체 팀(47)으로 편입 — 따라다니며 대신 싸움. 기본 180초,
-                             휴식/리로드로 사라지면 다시 부름(최대 6회), 시간이 끝나면 해제
+    ally <chrId> [npcParam] [초]  4m 옆에 스폰 후 영체 팀(47)으로 편입 — 따라다니며 대신 싸움.
+                             게임 영체처럼 휴식/리로드/사망으로 사라지면 끝. 최대 유지 600초
     dismiss                  아군 전부 해제(원래 팀으로)
     lua <code>               임의 Lua 실행 (chaosRec(id), chaosLog(msg) 사용 가능)
     read <id> [id ...]       레코드 값을 로그에 기록 (디버그)
@@ -149,8 +149,8 @@ local function playerPos()
 end
 
 local FOLLOW_DIST = 9.0      -- 이보다 멀어지면 플레이어 옆으로 당겨온다 (멀어지면 게임이 개체를 정리해 버림)
-local ALLY_LIFETIME = 180    -- 초. 영체 유지 시간 (ally 명령 3번째 인자로 바꿀 수 있음)
-local ALLY_RESPAWN_MAX = 6   -- 축복 휴식/리로드로 사라졌을 때 다시 불러오는 최대 횟수
+local ALLY_LIFETIME = 600    -- 초. 영체 최대 유지 시간 (ally 명령 3번째 인자로 바꿀 수 있음)
+local ALLY_RESPAWN_MAX = 0   -- 게임 영체처럼: 축복 휴식/리로드/사망으로 사라지면 그걸로 끝 (재소환 안 함)
 
 -- 개체가 아직 살아있는 ChrIns 인지: HP/MaxHP 가 정상 범위여야 한다. 아니면 포인터가 무효(리로드로 정리됨).
 -- 무효한 포인터에 계속 쓰면 그 메모리를 재사용하는 다른 개체를 건드릴 수 있으므로 바로 손을 뗀다.
@@ -185,6 +185,8 @@ local function allyFallbackStart(p, slot)
         slot.respawns = slot.respawns + 1
         log(('ally %s: vanished (rest/reload) — re-summoning %d/%d'):format(slot.chrId, slot.respawns, ALLY_RESPAWN_MAX))
         allySummon(slot)
+      else
+        log('ally ' .. slot.chrId .. ': gone (rest/reload/death) — released')
       end
       return
     end
