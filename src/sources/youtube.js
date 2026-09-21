@@ -128,7 +128,7 @@ export class YouTubeSource extends EventEmitter {
     while (!this.stopped) {
       let wait = this.minPollMs;
       try {
-        const r = await this.#get('/liveChatMessages', { liveChatId: this.liveChatId, part: 'snippet,authorDetails', pageToken: this.pageToken, maxResults: 200 });
+        const r = await this.#get('/liveChat/messages', { liveChatId: this.liveChatId, part: 'snippet,authorDetails', pageToken: this.pageToken, maxResults: 200 });
         this.pageToken = r.nextPageToken;
         wait = Math.max(this.minPollMs, r.pollingIntervalMillis ?? 0);
         if (r.offlineAt) {

@@ -24,7 +24,10 @@
     "텔포": "Teleport Random Grace",
     "슬로우": "Slow Motion",
     "힐": "Heal HP",
-    "무적": "God Mode"
+    "무적": "God Mode",
+    "영체": "Ally Wolf",
+    "아군말레니아": "Ally Malenia",
+    "아군라단": "Ally Radahn"
   },
   "tiers": [
     {
@@ -68,7 +71,6 @@
       "min": 5000,
       "pool": [
         "Basilisk",
-        "Monstrous Dog",
         "Demi-Human Gang",
         "Big Fingercreeper",
         "Bloodhound Knight",
@@ -102,17 +104,26 @@
         "Spawn Lightning Dragon",
         "Spawn Astel"
       ]
+    },
+    {
+      "min": 30000,
+      "pool": [
+        "Ally Malenia",
+        "Ally Radahn",
+        "Ally Dragon",
+        "Ally Runebear"
+      ]
     }
   ],
   "subscription": {
     "pool": [
-      "Heal HP",
+      "Ally Wolf",
+      "Ally Black Knife",
+      "Ally Crucible Knight",
+      "Ally Tree Sentinel",
       "God Mode",
       "One Hit Kill",
-      "Unlimited Stamina",
-      "Unlimited FP",
-      "Super Poise",
-      "Hide From Enemies"
+      "Heal HP"
     ]
   },
   "chatCommands": {

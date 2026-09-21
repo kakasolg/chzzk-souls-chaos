@@ -168,7 +168,7 @@ src/
 ├─ profiles/     효과 정의 — hexinton.json (기본), devpoland-hotkey.json (레거시 핫키 방식)
 ├─ backends/     cheatengine-lua (파일 큐 → CE Lua 브릿지) / cheatengine-hotkey / log
 └─ overlay/      OBS 브라우저 소스
-ce/chaos-bridge.lua   Cheat Engine autorun 에 설치되는 브릿지 (명령: activate/deactivate/set/freeze/speed/spawn/lua)
+ce/chaos-bridge.lua   Cheat Engine autorun 에 설치되는 브릿지 (명령: activate/deactivate/set/freeze/speed/spawn/ally/lua/setup)
 tools/
 ├─ fake-donation.js   가짜 이벤트 주입
 ├─ list-effects.js    효과 목록
@@ -188,6 +188,9 @@ tools/
 Elden Ring 1.17.1 (App 2.7.1) + Hexinton 8.0.4 + Cheat Engine 7.6 에서 실측:
 즉사 · 체력 1/반토막/회복 · FP 0 · 스태미나 0 · 슬로우/2배속 · 초근접 줌/광각 FOV · 랜덤 은총 이동 · 캐릭터 소환(개, c4520, 라단) · 무적 등 보상 토글의 30초 자동 해제.
 말레니아는 `c2120`, `c4520` 은 황금 번개 용(별도 효과로 유지). 쥐 떼 5마리 동시 소환 확인.
+**유튜브 라이브 채팅 → 어댑터 → 게임 end-to-end 확인** (2026-09-20, 지연 3~5초는 유튜브 폴링 API 특성).
+**영체(아군) 소환** 확인 — `ally` 명령: 스폰 개체를 영체 팀(47)+불사로 편입, 황금빛으로 플레이어 옆에서 대신 싸움. 구독 보상 기본값.
+크래시: `c4550` Monstrous Dog 은 게임을 죽이므로 제외. NPC(c2010 Blaidd 등)는 스포너로 안 나옴.
 박쥐 떼(4마리) 등장도 확인. 아직 눈으로 확인 못 한 것: 게임 정지.
 
 ## 로드맵

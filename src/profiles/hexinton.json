@@ -1,5 +1,5 @@
 {
-  "$comment": "Hexinton All in One 8.0.x 치트 테이블 + ce/chaos-bridge.lua 용 프로필. 숫자는 치트 테이블 메모리 레코드 ID. 백엔드: cheatengine-lua",
+  "$comment": "Hexinton All in One 8.0.x 치트 테이블 + ce/chaos-bridge.lua 용 프로필. 숫자는 치트 테이블 메모리 레코드 ID. 백엔드: cheatengine-lua. 주의: c4550(Monstrous Dog)은 게임 크래시, c2010(Blaidd) 등 NPC는 스포너로 안 나옴",
   "backend": "cheatengine-lua",
   "defaultDuration": 30000,
   "init": [
@@ -588,15 +588,6 @@
         ]
       ]
     },
-    "Monstrous Dog": {
-      "label": "괴물 개",
-      "on": [
-        [
-          "spawn",
-          "c4550"
-        ]
-      ]
-    },
     "Basilisk": {
       "label": "바실리스크(사혈)",
       "on": [
@@ -831,6 +822,78 @@
         [
           "spawn",
           "c4620"
+        ]
+      ]
+    },
+    "Ally Wolf": {
+      "label": "영체: 늑대",
+      "on": [
+        [
+          "ally",
+          "c4070"
+        ]
+      ]
+    },
+    "Ally Black Knife": {
+      "label": "영체: 검은 칼 암살자",
+      "on": [
+        [
+          "ally",
+          "c2100"
+        ]
+      ]
+    },
+    "Ally Crucible Knight": {
+      "label": "영체: 도가니 기사",
+      "on": [
+        [
+          "ally",
+          "c2500"
+        ]
+      ]
+    },
+    "Ally Tree Sentinel": {
+      "label": "영체: 나무 파수꾼",
+      "on": [
+        [
+          "ally",
+          "c3251"
+        ]
+      ]
+    },
+    "Ally Runebear": {
+      "label": "영체: 룬곰",
+      "on": [
+        [
+          "ally",
+          "c4630"
+        ]
+      ]
+    },
+    "Ally Dragon": {
+      "label": "영체: 드래곤",
+      "on": [
+        [
+          "ally",
+          "c4500"
+        ]
+      ]
+    },
+    "Ally Malenia": {
+      "label": "영체: 말레니아",
+      "on": [
+        [
+          "ally",
+          "c2120"
+        ]
+      ]
+    },
+    "Ally Radahn": {
+      "label": "영체: 라단",
+      "on": [
+        [
+          "ally",
+          "c4730"
         ]
       ]
     }

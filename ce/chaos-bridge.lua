@@ -13,6 +13,7 @@
     unfreeze <id>            고정 해제
     speed <x>                speedhack_setSpeed(x)
     spawn <chrId> [npcParam] Hexinton Character Spawner 로 캐릭터 스폰 (플레이어 위치)
+    ally <chrId> [npcParam]  스폰 후 아군(영체 팀 47, 불사)으로 편입 — 따라다니며 대신 싸움
     lua <code>               임의 Lua 실행 (chaosRec(id), chaosLog(msg) 사용 가능)
     read <id> [id ...]       레코드 값을 로그에 기록 (디버그)
     ping                     로그에 pong
@@ -68,6 +69,44 @@ local function spawn(chrId, npcParam)
   rec(HEX.spawnDebug).Active = true
 end
 
+-- 스폰한 개체를 아군으로 편입. Hexinton "Recruit Target as Ally" 와 같은 방식(팀 47 + NoDead)이지만
+-- 락온 없이 SpawnedEnemy 포인터를 직접 잡는다. 테이블의 RecruitAlly 목록에도 넣어 따라다니게 한다.
+local HEX_TARGETED_ENEMY = 601372
+local HEX_RECRUIT_ALLY   = 1337320100
+local function ally(chrId, npcParam)
+  rec(HEX_TARGETED_ENEMY).Active = true
+  rec(HEX_RECRUIT_ALLY).Active = true
+  local okPrev, prev = pcall(readQword, 'SpawnedEnemy')
+  if not okPrev then prev = nil end
+  spawn(chrId, npcParam)
+  local tries = 0
+  local t = createTimer(nil)
+  t.Interval = 100
+  t.OnTimer = function(tm)
+    tries = tries + 1
+    local ok, p = pcall(readQword, 'SpawnedEnemy')
+    if ok and p and p ~= 0 and p ~= prev then
+      tm.destroy()
+      local okA = pcall(writeBytes, p + 0x6C, 47)                     -- Alliance: Spirit Summon team
+      local okF, fb = pcall(readBytes, p + 0x1C5, 1, true)
+      local flags = (okF and fb and fb[1]) or 0
+      if flags % 2 < 1 then pcall(writeBytes, p + 0x1C5, flags + 1) end -- NoDead
+      local registered = false
+      if RecruitAlly_AddCurrentTarget then
+        -- 테이블의 편입 루틴은 락온 대상을 보므로, 잠시 그 포인터를 스폰 개체로 바꿔치기한다
+        pcall(writeQword, 'LastLockOnTarget', p)
+        local okR, r1 = pcall(RecruitAlly_AddCurrentTarget, true)
+        registered = okR and r1 == true
+      end
+      log(('ally %s: team=%s follow=%s'):format(chrId, tostring(okA), tostring(registered)))
+    elseif tries > 50 then
+      tm.destroy()
+      log('ally ' .. chrId .. ': spawn did not register in 5s')
+    end
+  end
+  t.Enabled = true
+end
+
 -- 테이블의 Lua 가 띄우는 안내 팝업(버전 경고 등)을 막는다. 전체화면 게임 포커스를 뺏기 때문.
 local function silenceDialogs()
   showMessage = function() end
@@ -101,6 +140,7 @@ local handlers = {
   unfreeze   = function(id) rec(id).Active = false end,
   speed      = function(x) speedhack_setSpeed(tonumber(x)) end,
   spawn      = spawn,
+  ally       = ally,
   lua        = function(code) assert(load(code))() end,
   read       = function(...)
     local out = {}
