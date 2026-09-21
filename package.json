@@ -11,7 +11,8 @@
     "fake": "node tools/fake-donation.js",
     "keys": "node tools/list-effects.js",
     "install-bridge": "node tools/install-bridge.js",
-    "attach": "node tools/attach.js"
+    "attach": "node tools/attach.js",
+    "doctor": "node tools/doctor.js"
   },
   "engines": { "node": ">=20" },
   "license": "MIT",

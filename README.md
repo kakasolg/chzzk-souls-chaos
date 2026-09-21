@@ -47,6 +47,10 @@
 
 ## 설치 (스트리머, 약 20분)
 
+> 처음이면 [**docs/CHECKLIST.md**](docs/CHECKLIST.md) 를 열어 순서대로 체크하세요 — 단계마다 "실행 → 확인 → 안 되면" 이 적혀 있습니다.
+> 언제든 `npm run doctor` 를 실행하면 무엇이 빠졌는지와 고치는 명령을 알려줍니다.
+> ChatGPT·Gemini 같은 AI 에게 도움을 받을 거면 [**docs/AI-ASSISTANT.md**](docs/AI-ASSISTANT.md) 를 통째로 붙여넣고 시작하세요 (AI 가 없는 명령을 지어내지 않도록 사실 목록을 줍니다).
+
 ### 준비물
 
 | 항목 | 비고 |
@@ -69,6 +73,12 @@ npm run install-bridge
 ```
 
 마지막 명령은 Cheat Engine의 `autorun` 폴더에 작은 Lua 브릿지를 복사합니다 (CE가 켜질 때 자동 실행되어 어댑터의 명령을 받습니다).
+
+설치가 끝나면:
+```bash
+npm run doctor
+```
+`❌` 가 없으면 준비 완료. 있으면 각 줄 아래 `→` 안내를 따르세요.
 
 ### 2. `.env` 편집
 
@@ -197,6 +207,8 @@ npm run fake -- chat "!fx Kill Player"         # 스트리머 채팅 명령
 ---
 
 ## 문제가 생기면
+
+먼저 `npm run doctor` — 대부분의 문제는 여기서 원인과 해결 명령이 나옵니다.
 
 | 증상 | 확인 |
 |---|---|
