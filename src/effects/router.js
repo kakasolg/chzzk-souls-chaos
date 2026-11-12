@@ -24,6 +24,8 @@ export class Router {
     this.cfg = config;
     this.all = allEffects.filter((n) => !(config.disabled ?? []).includes(n));
     this.tiers = [...(config.tiers ?? [])].sort((a, b) => b.min - a.min); // 높은 금액 우선
+    // 긴 키워드부터 검사: "번개용" 후원이 그 안의 "개"·"용" 에 먼저 걸리지 않도록
+    this.keywords = Object.entries(config.keywords ?? {}).sort((a, b) => b[0].length - a[0].length);
   }
 
   #pool(tier) {
@@ -44,7 +46,7 @@ export class Router {
     // 키워드 효과는 금액 이하의 모든 티어 pool 합집합에서 허용 (5000원 효과를 10000원 후원으로 지목 가능)
     const text = donationText.toLowerCase();
     const allowed = new Set(this.tiers.filter((t) => amount >= t.min).flatMap((t) => this.#pool(t)));
-    for (const [kw, effect] of Object.entries(this.cfg.keywords ?? {})) {
+    for (const [kw, effect] of this.keywords) {
       if (text.includes(kw.toLowerCase()) && allowed.has(effect)) return { effect, reason: `keyword:${kw}` };
     }
     const effect = this.#pick(this.#pool(tier));
