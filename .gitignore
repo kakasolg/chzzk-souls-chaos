@@ -9,3 +9,4 @@ client/.venv/
 client/
 client_secret*.json
 __pycache__/
+overlay-dll/obj/

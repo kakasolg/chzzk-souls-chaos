@@ -304,6 +304,16 @@ local function patchedTablePath(ctPath)
   return out
 end
 
+-- 게임 안 표시 DLL (overlay-dll/chaos-overlay.dll). 어댑터가 overlaydll 명령으로 경로를 알려 주면 주입하고,
+-- 게임이 다시 켜져 setup 이 새 프로세스에 붙을 때도 다시 주입한다.
+chaosOverlayDll = chaosOverlayDll
+local function injectOverlay()
+  if not chaosOverlayDll then return end
+  if getAddressSafe('chaos-overlay.dll') then return end  -- 이미 들어가 있음
+  local ok, err = pcall(injectDLL, chaosOverlayDll, true)
+  log(ok and ('overlay dll injected: ' .. chaosOverlayDll) or ('FAIL overlay dll inject -> ' .. tostring(err)))
+end
+
 local lastCtPath
 local function setup(ctPath)
   lastCtPath = ctPath
@@ -329,6 +339,7 @@ local function setup(ctPath)
   if not en then error('[ Enable ] not found — is this the Hexinton table?') end
   if not en.Active then en.Active = true end
   log(('setup: pid=%d entries=%d enable=%s'):format(getOpenedProcessID(), getAddressList().Count, tostring(en.Active)))
+  injectOverlay()
 end
 
 -- 외부(Python) 리더가 테이블의 AOB 스캔 결과를 재사용할 수 있게 심볼 주소를 내보낸다
@@ -499,6 +510,7 @@ local handlers = {
   overload   = overload,
   unoverload = unoverload,
   setup      = function(...) setup(table.concat({ ... }, ' ')) end,
+  overlaydll = function(...) chaosOverlayDll = table.concat({ ... }, ' '); injectOverlay() end,
   symbols    = symbols,
   warp       = function(id) rec(1337304716).Value = tostring(id); rec(1337304717).Active = true end,
   ping       = function() log('pong') end,

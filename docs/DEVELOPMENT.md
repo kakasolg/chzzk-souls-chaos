@@ -86,6 +86,24 @@ tools/
 - 구르기만 끄는 플래그는 어디에도 없다. Hexinton 의 No Weight 스크립트 AOB(`ff c3 83 fb ? 7c ? 4c 8d 5c 24`)는 1.17.2 의 eldenring.exe 에서 안 잡힌다 → 코드 대신 param 무게를 바꾸는 방식으로 구현. param 은 모든 같은 무기에 적용되지만 20초 뒤 원래 값으로 돌린다.
 - CE 를 켠 채 게임만 재시작하면 예전엔 옛 프로세스에 붙은 채로 남아 값이 전부 ?? 였다 → setup 이 새 PID 를 보면 다시 붙도록 고침. CE 를 완전히 새로 켜고 attach 하는 것도 9초에 성공.
 
+### 게임 안 표시 DLL (overlay-dll/, 2026-11-12)
+
+창 오버레이(`npm run screen`)는 내 화면에만 보이고 창 모드에서만 된다. 그래서 게임 프레임에 직접 그리는 DLL 을 만들었다.
+
+- 주입: CE 브릿지 `overlaydll <경로>` → `injectDLL`. 게임 재시작으로 setup 이 다시 돌면 자동 재주입. 모드 로더 불필요.
+- **1차 시도 (실패, 크래시)**: DXGI/D3D12 vtable(Present·ResizeBuffers·ExecuteCommandLists)을 덮어썼다. Steam 오버레이와 OBS graphics-hook 도
+  같은 자리를 훅하고 있어서, 세 번째 훅이 끼자 둘이 서로를 무한 호출 → `gameoverlayrenderer64` ↔ `graphics_hook64` 스택 오버플로(0xC00000FD).
+  덤프(`%LOCALAPPDATA%\CrashDumps`)를 WinDbg cdb 로 열어 확인. 우리 DLL 은 스택에 없었다.
+- **지금 방식**: DXGI 는 안 건드리고 eldenring.exe 안의 Present 호출 한 곳(`48 8B 0B 45 33 C0 41 8B D4 48 8B 01 FF 50 40`, 1.17.2 에서 유일, eldenring+0x1EA0EA6)의
+  `mov rax,[rcx]; call [rax+40h]` 를 `call stub; nop` 으로 바꾼다. stub → `GamePresent` 가 그리고 나서 vtable 로 Present 를 부르므로 Steam/OBS 체인은 그대로.
+  패치하는 동안 다른 스레드를 멈추고, 그 6바이트를 실행 중인 스레드가 있으면 다시 시도.
+- 게임의 DIRECT 큐: 스왑체인 객체 안에서 vtable 이 D3D12 command queue 인 포인터를 찾는다 (1.17.2: swapchain+0x140).
+- 스왑체인 형식이 R10G10B10A2(24)라 D2D 가 직접 못 그림 → BGRA 텍스처에 D2D/DirectWrite 로 그리고(글자가 바뀔 때만) D3D11On12 + 셰이더로 알파 합성.
+  백버퍼는 매 프레임 감싸고 바로 놓는다 (프레임 사이에 참조를 들고 있으면 게임의 ResizeBuffers 가 실패).
+- 확인: Steam 오버레이 + OBS 게임 캡처가 붙은 상태에서 여러 줄 + 대기 수 표시, 게임 정상 (1280x720 창 모드).
+- 빌드: `overlay-dlluild.bat` (VS 2019 Build Tools 이상). 게임이 DLL 을 잡고 있으면 덮어쓸 수 없으니 `build.bat 다른이름.dll`.
+- 미확인: 전체화면, 해상도 변경 중, HDR, ReShade/DLSS 모드와 함께.
+
 ### 소환 크래시 (1.17.2) 와 수정
 
 - 증상: 말레니아 소환 2초 뒤 eldenring.exe 크래시 (c0000005, 실패 모듈 unknown = CE 가 넣은 코드).

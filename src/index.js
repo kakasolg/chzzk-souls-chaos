@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import fs from 'node:fs';
 import http from 'node:http';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer } from 'ws';
@@ -38,12 +39,8 @@ const server = http.createServer((req, res) => {
   }
   if (req.method === 'GET' && req.url === '/state') {
     // 게임 화면 표시 창(tools/screen-overlay.ps1)용: 지금 걸린 효과와 대기 수
-    const now = Date.now();
-    for (const [k, v] of onScreen) if (v.until < now) onScreen.delete(k);
-    const active = [...onScreen.values()].map((v) => ({ text: v.text, left: Math.max(0, Math.ceil((v.until - now) / 1000)) }));
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-    const n = executor.queue.length;
-    return res.end(JSON.stringify({ active, pending: n, footer: n ? `대기 ${n}건` : '' }));
+    return res.end(JSON.stringify(screenState()));
   }
   if (req.method === 'GET' && req.url === '/effects') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -79,6 +76,22 @@ const broadcast = (msg) => {
 const onScreen = new Map();
 const lasting = (name) => { const d = executor.get(name) ?? {}; return Boolean(d.off || d.every); };
 let screenSeq = 0;
+function screenState() {
+  const now = Date.now();
+  for (const [k, v] of onScreen) if (v.until < now) onScreen.delete(k);
+  const active = [...onScreen.values()].map((v) => ({ text: v.text, left: Math.max(0, Math.ceil((v.until - now) / 1000)) }));
+  const n = executor.queue.length;
+  return { active, pending: n, footer: n ? `대기 ${n}건` : '' };
+}
+// 게임 안 표시 DLL(overlay-dll)용: 1초마다 screen.txt 에 쓴다. 마지막 '#' 줄은 대기 수.
+// DLL 은 3초 넘게 안 바뀐 파일은 무시하므로 어댑터가 꺼지면 화면에서도 사라진다.
+const screenFile = path.join(backend.dir ?? path.join(os.tmpdir(), 'chzzk-souls-chaos'), 'screen.txt');
+setInterval(() => {
+  const s = screenState();
+  const lines = s.active.map((a) => `${a.text}  ${a.left}s`);
+  if (s.footer) lines.push('#' + s.footer);
+  try { fs.writeFileSync(screenFile, lines.join('\n')); } catch { /* 다음 초에 다시 */ }
+}, 1000).unref();
 executor.on('start', (e) => {
   console.log(`▶ ${e.label} (${e.name}) ← ${e.by ?? '?'} ${e.amount ? e.amount + '원' : ''} [${e.source}]`);
   broadcast({ type: 'start', ...e });
@@ -184,6 +197,12 @@ server.listen(port, '127.0.0.1', async () => {
   console.log(`OBS 브라우저 소스: http://localhost:${port}/overlay`);
   console.log('가짜 후원: npm run fake -- 20000 "말레니아" 닉네임');
   executor.init().catch((e) => console.error('[init]', e.message));
+  // config.screenOverlay === 'dll' 이면 Cheat Engine 브릿지가 게임에 표시 DLL 을 주입한다 (게임을 다시 켜도 다시 주입)
+  if (config.screenOverlay === 'dll' && backendName === 'cheatengine-lua') {
+    const dll = path.join(ROOT, 'overlay-dll', 'chaos-overlay.dll');
+    if (fs.existsSync(dll)) backend.send(['overlaydll', dll]);
+    else console.error(`[overlay] ${dll} 없음 — overlay-dll/build.bat 로 빌드하세요`);
+  }
   await connectChzzk().catch((e) => console.error('[chzzk]', e.message));
   await connectYouTube().catch((e) => console.error('[youtube]', e.message));
 });

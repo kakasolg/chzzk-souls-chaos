@@ -143,6 +143,7 @@
       "Ally Melina"
     ]
   },
+  "screenOverlay": "dll",
   "chatCommands": {
     "enabled": true,
     "prefix": "!",
