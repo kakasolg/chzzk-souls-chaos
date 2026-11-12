@@ -37,7 +37,7 @@ export class EffectExecutor extends EventEmitter {
     this.minGapMs = minGapMs;
     this.gapMs = gapMs;
     this.maxPending = maxPending;
-    this.active = new Set();
+    this.active = new Map(); // name → def (끌 때 off 를 실행하려고)
     this.queue = [];
     this.lastStart = 0;
     this.draining = false;
@@ -59,13 +59,24 @@ export class EffectExecutor extends EventEmitter {
 
   /** 명령을 직렬화해서 백엔드로 보낸다 (동시 실행 효과끼리 순서가 섞이지 않도록). */
   #send(cmd) {
-    this.chain = this.chain.then(async () => {
+    const step = this.chain.then(async () => {
       const wait = this.lastSend + this.minGapMs - Date.now();
       if (wait > 0) await sleep(wait);
-      this.backend.send(cmd);
+      // 브릿지가 큐 파일을 가져가는 순간과 겹치면 쓰기가 잠깐 실패할 수 있어 몇 번 다시 시도한다
+      for (let i = 0; ; i++) {
+        try {
+          this.backend.send(cmd);
+          break;
+        } catch (e) {
+          if (i >= 4) throw e;
+          await sleep(50);
+        }
+      }
       this.lastSend = Date.now();
     });
-    return this.chain;
+    // 한 명령이 실패해도 다음 명령(특히 off)은 계속 나가도록 체인은 살려 둔다
+    this.chain = step.catch(() => {});
+    return step;
   }
 
   async #runCommands(cmds) {
@@ -73,6 +84,21 @@ export class EffectExecutor extends EventEmitter {
       if (cmd[0] === 'wait') await sleep(Number(cmd[1]));
       else await this.#send(cmd);
     }
+  }
+
+  /** 진행 중인 효과의 off 명령을 즉시(동기) 보낸다. 프로그램 종료용. 반환값은 해제한 효과 수. */
+  revertAll() {
+    this.queue.length = 0;
+    let n = 0;
+    for (const def of this.active.values()) {
+      for (const cmd of def.off ?? []) {
+        if (cmd[0] === 'wait') continue;
+        try { this.backend.send(cmd); } catch { /* 종료 중이라 무시 */ }
+      }
+      n++;
+    }
+    this.active.clear();
+    return n;
   }
 
   /** 효과를 대기열에 넣는다. 반환값은 대기 순번 (0 = 바로 시작). */
@@ -110,7 +136,7 @@ export class EffectExecutor extends EventEmitter {
   }
 
   async #run(name, def, meta) {
-    this.active.add(name);
+    this.active.set(name, def);
     const info = { name, label: def.label ?? name, ...meta };
     this.emit('start', info);
     const duration = def.duration ?? this.table.defaultDuration ?? 30000;

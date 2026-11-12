@@ -357,6 +357,9 @@ local function tick()
   os.remove(WORK)
 end
 
+-- CE 가 꺼져 있던 동안 쌓인 명령은 버린다 (다시 켜질 때 즉사 같은 효과가 한꺼번에 터지지 않게)
+os.remove(CMD); os.remove(WORK)
+
 if chaosBridgeTimer then chaosBridgeTimer.destroy() end
 chaosBridgeTimer = createTimer(nil)
 chaosBridgeTimer.Interval = 100

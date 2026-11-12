@@ -122,7 +122,7 @@ YOUTUBE_CLIENT_SECRET=...
 
 - 처음 라이브를 켜는 채널은 YouTube Studio에서 **라이브 스트리밍 활성화 후 24시간** 기다려야 합니다.
 - 슈퍼챗 통화는 `config.json`의 `youtube.rates`로 원화 환산됩니다 (기본 USD 1,350원).
-- 유튜브 채팅은 3~5초 지연이 있습니다 (폴링 API). 하루 쿼터 10,000 → 약 2.7시간 방송분. 긴 방송은 Google Cloud에서 쿼터 증설을 신청하거나 `.env`의 `YOUTUBE_POLL_MS`를 늘리세요.
+- 유튜브 채팅은 3~5초 지연이 있습니다 (폴링 API). 하루 쿼터 10,000 → 기본 설정(5초 간격)으로 약 2.7시간 방송분. 다 쓰면 터미널에 쿼터 소진이 뜨고 30분마다 다시 시도합니다. 긴 방송은 Google Cloud에서 쿼터 증설을 신청하거나 `.env`의 `YOUTUBE_POLL_MS`를 늘리세요.
 - 왜 스트리머마다 구글 설정이 필요한가: 유튜브 OAuth 앱은 만든 사람의 계정에 묶이고 공개하려면 구글 심사가 필요합니다. 각자 만들면 심사 없이 바로 쓰고 쿼터도 따로 받습니다.
 
 ---
@@ -206,7 +206,7 @@ YOUTUBE_CLIENT_SECRET=...
 ```bash
 npm start
 # 다른 터미널에서
-npm run fake -- 5000 "말레니아" 후원자닉      # 후원 5,000원
+npm run fake -- 20000 "말레니아" 후원자닉     # 후원 20,000원 (말레니아는 보스 티어)
 npm run fake -- sub 구독자닉                   # 구독
 npm run fake -- chat "!fx Kill Player"         # 스트리머 채팅 명령
 ```

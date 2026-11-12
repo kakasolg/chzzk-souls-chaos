@@ -43,8 +43,12 @@ if (ceRunning()) {
   const exe = [
     process.env.CHEAT_ENGINE_EXE,
     path.join(os.homedir(), 'scoop/apps/cheat-engine/current/cheatengine-x86_64.exe'),
-    'C:/Program Files/Cheat Engine 7.6/cheatengine-x86_64.exe',
-    'C:/Program Files/Cheat Engine 7.5/cheatengine-x86_64.exe',
+    ...['C:/Program Files', 'C:/Program Files (x86)'].flatMap((root) => {
+      try {
+        return fs.readdirSync(root).filter((d) => /^cheat engine/i.test(d)).sort().reverse()
+          .map((d) => `${root}/${d}/cheatengine-x86_64.exe`);
+      } catch { return []; }
+    }),
   ].find((p) => p && fs.existsSync(p));
   if (!exe) {
     console.error('Cheat Engine 을 찾지 못했습니다. .env 에 CHEAT_ENGINE_EXE 를 지정하세요.');

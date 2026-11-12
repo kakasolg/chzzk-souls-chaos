@@ -68,7 +68,7 @@ CHZZK_REDIRECT_URI=http://localhost:8080/callback
 YOUTUBE_CLIENT_ID=      # 유튜브 쓰면
 YOUTUBE_CLIENT_SECRET=  # GOCSPX- 로 시작
 YOUTUBE_REDIRECT_URI=http://localhost:8081/callback
-YOUTUBE_POLL_MS=3000
+YOUTUBE_POLL_MS=5000
 PROFILE=hexinton
 BACKEND=                # 비워 둠. log 로 두면 게임에 안 보내고 콘솔만 (테스트)
 ADAPTER_PORT=8008
@@ -190,7 +190,7 @@ CHEAT_ENGINE_EXE=       # CE 가 기본 경로에 없을 때만
 - `Giant Crab` — 거대 게
 
 ### 알려진 제한
-- 유튜브 채팅은 3~5초 지연. 하루 쿼터 10,000 (약 2.7시간 방송)
+- 유튜브 채팅은 3~5초 지연. 하루 쿼터 10,000 (기본 5초 간격으로 약 2.7시간 방송). 다 쓰면 30분마다 다시 시도
 - 치지직 연동은 문서 스펙대로 작성됐고 실제 방송에서 아직 검증되지 않음 — 첫 사용 시 로그를 개발자에게 보내주면 좋음
 - `c4550`(Monstrous Dog) 은 게임 크래시 → 사용 금지. 목록에 없는 몹 ID 를 추가하지 말 것
 - 영체(멜리나 등)는 축복 휴식·사망 시 사라짐 (정상)

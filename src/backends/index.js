@@ -23,6 +23,8 @@ export class CheatEngineLuaBackend {
     this.dir = dir;
     this.file = path.join(dir, 'cmd.txt');
     fs.mkdirSync(dir, { recursive: true });
+    // 지난 실행에서 남은 명령(즉사 등)이 브릿지가 다시 켜질 때 한꺼번에 터지지 않도록 비운다
+    try { fs.rmSync(this.file, { force: true }); } catch { /* 브릿지가 잡고 있으면 그냥 둔다 */ }
   }
 
   send(cmd) {
@@ -48,6 +50,7 @@ export class CheatEngineHotkeyBackend {
     this.proc.stdout.on('data', (d) => process.env.DEBUG_KEYS && console.log('[keys]', d.toString().trim()));
     this.proc.stderr.on('data', (d) => console.error('[keys]', d.toString().trim()));
     this.proc.on('exit', (code) => console.error(`[keys] keysender exited (${code})`));
+    this.proc.stdin.on('error', (e) => console.error('[keys] keysender 입력 실패:', e.message));
   }
 
   send(cmd) {

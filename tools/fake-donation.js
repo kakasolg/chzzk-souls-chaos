@@ -25,5 +25,5 @@ if (a === 'sub') {
   };
 }
 
-const res = await fetch(`http://localhost:${port}/fake/${kind}`, { method: 'POST', body: JSON.stringify(body) });
+const res = await fetch(`http://127.0.0.1:${port}/fake/${kind}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 console.log(res.status, await res.text());

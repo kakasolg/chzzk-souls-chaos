@@ -37,7 +37,7 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(Number(port) || 80, () => {
+server.listen(Number(port) || 80, '127.0.0.1', () => {
   console.log('브라우저에서 치지직 로그인 창이 열립니다. 안 열리면 아래 주소를 직접 여세요:\n' + authUrl);
   exec(`start "" "${authUrl}"`);
 });

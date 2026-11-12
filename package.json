@@ -14,11 +14,13 @@
     "attach": "node tools/attach.js",
     "doctor": "node tools/doctor.js"
   },
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "license": "MIT",
   "dependencies": {
     "dotenv": "^16.4.5",
-    "socket.io-client": "2.0.3",
+    "socket.io-client": "2.5.0",
     "ws": "^8.18.0"
   }
 }

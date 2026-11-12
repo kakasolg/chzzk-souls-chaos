@@ -18,12 +18,12 @@ const API = 'https://www.googleapis.com/youtube/v3';
  *
  * ── 알려진 한계 ──────────────────────────────
  *  · 폴링 방식이라 지연이 3~5초 있다 (pollingIntervalMillis 를 따른다).
- *  · liveChatMessages.list 는 호출당 쿼터 5 — 기본 일일 쿼터 10,000 이면 약 2.7시간치.
+ *  · liveChatMessages.list 는 호출당 쿼터 5 — 기본 일일 쿼터 10,000 이면 5초 간격 기준 약 2.7시간치.
  *    긴 방송은 Google Cloud 에서 쿼터 증설을 신청하거나 YOUTUBE_POLL_MS 를 늘려야 한다.
  *  · 슈퍼챗 통화가 KRW 가 아니면 config.youtube.rates 로 원화 환산해 티어에 맞춘다.
  */
 export class YouTubeSource extends EventEmitter {
-  constructor(client, { rates = { KRW: 1, USD: 1350, JPY: 9, EUR: 1450 }, minPollMs = 3000 } = {}) {
+  constructor(client, { rates = { KRW: 1, USD: 1350, JPY: 9, EUR: 1450 }, minPollMs = 5000 } = {}) {
     super();
     this.client = client;
     this.rates = rates;
@@ -73,7 +73,7 @@ export class YouTubeSource extends EventEmitter {
           setTimeout(() => server.close(), 300);
         }
       });
-      server.listen(Number(port) || 80, () => {
+      server.listen(Number(port) || 80, '127.0.0.1', () => {
         console.log('브라우저에서 구글 로그인 창이 열립니다. 안 열리면 아래 주소를 직접 여세요:\n' + url);
         exec(`start "" "${url}"`);
       });
@@ -95,7 +95,12 @@ export class YouTubeSource extends EventEmitter {
     Object.entries(params).forEach(([k, v]) => v != null && url.searchParams.set(k, v));
     const res = await fetch(url, { headers: { Authorization: `Bearer ${await this.#accessToken()}` } });
     const json = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(`${path} -> ${res.status} ${json.error?.message ?? ''}`.trim());
+    if (!res.ok) {
+      const e = new Error(`${path} -> ${res.status} ${json.error?.message ?? ''}`.trim());
+      e.status = res.status;
+      e.reason = json.error?.errors?.[0]?.reason;
+      throw e;
+    }
     return json;
   }
 
@@ -146,6 +151,17 @@ export class YouTubeSource extends EventEmitter {
       } catch (e) {
         this.emit('error', e);
         wait = 10000;
+        if (e.reason === 'quotaExceeded' || e.reason === 'dailyLimitExceeded') {
+          // 오늘 쿼터를 다 씀 — 계속 두드려도 소용없어 30분 쉬었다가 다시 시도
+          this.emit('quota');
+          wait = 30 * 60 * 1000;
+        } else if (e.status === 403 || e.status === 404) {
+          // 방송 종료/채팅 없음 (liveChatEnded, liveChatNotFound 등) → 다음 방송을 기다린다
+          this.emit('ended');
+          this.liveChatId = null;
+          this.pageToken = null;
+          return this.start();
+        }
       }
       await sleep(wait);
     }
@@ -164,7 +180,13 @@ export class YouTubeSource extends EventEmitter {
       case 'superChatEvent':
       case 'superStickerEvent': {
         const d = s.superChatDetails ?? s.superStickerDetails;
-        const amount = (Number(d.amountMicros) / 1e6) * (this.rates[d.currency] ?? 0);
+        let rate = this.rates[d.currency];
+        if (rate == null) {
+          // 환율표에 없는 통화도 슈퍼챗을 버리지 않는다 — 대략 달러로 보고, config.youtube.rates 에 추가하라고 알린다
+          this.emit('error', new Error(`환율 없음: ${d.currency} — config.json 의 youtube.rates 에 추가하세요 (지금은 USD 로 계산)`));
+          rate = this.rates.USD ?? 1350;
+        }
+        const amount = (Number(d.amountMicros) / 1e6) * rate;
         this.emit('donation', {
           donatorNickname: nickname, payAmount: String(Math.round(amount)),
           donationText: d.userComment ?? '', currency: d.currency, amountDisplay: d.amountDisplayString,
