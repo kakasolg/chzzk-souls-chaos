@@ -37,7 +37,7 @@ tools/
 | 치트 테이블 | **Hexinton All in One v8.0.4** (Nexus mods/48, 2026-09-10) | 메모리 레코드 ID 는 이 버전 기준. 테이블이 갱신되면 ID 확인 필요 |
 | Node.js | 24.19 (20 이상이면 됨) | |
 | OBS Studio | 32.2.2 (winget) | Game Capture "특정 창" 모드 |
-| 유튜브 | YouTube Data API v3, Desktop OAuth (테스트 모드) | 채널 "mo kha" 로 Unlisted 라이브 |
+| 유튜브 | YouTube Data API v3, Desktop OAuth (테스트 모드) | 테스트 채널에서 Unlisted 라이브 |
 
 ## 실측 완료 (2026-09-19 ~ 20)
 

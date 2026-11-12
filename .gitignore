@@ -5,4 +5,7 @@ youtube-tokens*.json
 config.json
 *.log
 vendor/
+client/.venv/
 client/
+client_secret*.json
+__pycache__/
