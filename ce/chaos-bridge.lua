@@ -25,6 +25,7 @@
     setrandom <id,id,...> <v1> <v2> ...   목록에서 하나 골라 모든 id 에 setsave (무기 랜덤)
     jolt <delta> <id> [id ...]            id 중 하나를 골라 ±delta (능력치 흔들기, 1 아래로 안 내려감)
     pull [반경 m] [최대 수]  가까운 일반 적을 플레이어 주변으로 끌어온다 (보스 제외)
+    overload [무게]          오른손 무기 param 무게를 잠시 크게 → 과적으로 구르기 금지 / unoverload 로 복구
     ping                     로그에 pong
 
   로그: %TEMP%\chzzk-souls-chaos\bridge.log  (CE Lua 엔진 창(Ctrl+Alt+L)에도 print)
@@ -425,7 +426,51 @@ local function pull(radius, maxN)
   log(('pull: %d enemies within %dm, moved %d'):format(#found, radius, n))
 end
 
+-- ── 구르기 금지 (과적) ───────────────────────────────────
+-- 테이블에 구르기만 끄는 플래그가 없어서, 장착한 오른손 무기의 param 무게를 잠시 크게 만들어 과적 상태로 만든다.
+-- 과적이면 구르기·달리기가 막히고 걷기만 된다. 공격은 된다. 행 찾는 방식은 Hexinton ParamUtils 와 같다.
+local function paramRow(paramName, id)
+  local reg = getAddressSafe('CSRegulationManagerImp')
+  if not reg then error('CSRegulationManagerImp symbol missing') end
+  local list = readQword(reg) + 0x18
+  local s, e = readQword(list), readQword(list + 8)
+  for a = s, e - 8, 8 do
+    local p = readQword(a)
+    local name = (readInteger(p + 0x28) or 0) > 7 and readString(readQword(p + 0x18), 90, true) or readString(p + 0x18, 90, true)
+    if name == paramName then
+      local base = readQword(readQword(p + 0x80) + 0x80)
+      local n = readSmallInteger(base + 0x0A) & 0xFFFF
+      for i = 0, n - 1 do
+        if readInteger(base + 0x40 + 0x18 * i) == id then return base + readInteger(base + 0x48 + 0x18 * i) end
+      end
+      error(('%s row %d not found'):format(paramName, id))
+    end
+  end
+  error('param ' .. paramName .. ' not found')
+end
+
+local RIGHT_WEP = 1337193096
+local overloadAddr = nil
+local function overload(weight)
+  if overloadAddr then return end
+  local wep = readInteger(rec(RIGHT_WEP).CurrentAddress)
+  local row = wep - wep % 100            -- 강화 수치(+0~25)는 행 ID 에 없다
+  local addr = paramRow('EquipParamWeapon', row) + 0x10
+  chaosSaved['overload'] = readFloat(addr)
+  writeFloat(addr, tonumber(weight) or 999)
+  overloadAddr = addr
+  log(('overload: weapon %d row %d weight %.1f -> %s'):format(wep, row, chaosSaved['overload'], weight or 999))
+end
+
+local function unoverload()
+  if not overloadAddr then return end
+  writeFloat(overloadAddr, chaosSaved['overload'])
+  chaosSaved['overload'], overloadAddr = nil, nil
+end
+
 local handlers = {
+  overload   = overload,
+  unoverload = unoverload,
   setup      = function(...) setup(table.concat({ ... }, ' ')) end,
   symbols    = symbols,
   warp       = function(id) rec(1337304716).Value = tostring(id); rec(1337304717).Active = true end,

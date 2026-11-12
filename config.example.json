@@ -45,6 +45,7 @@
     "멜리나": "Ally Melina",
     "크래시": "Fake Crash",
     "멈춰": "Stop Moving",
+    "구르기": "No Roll",
     "무기": "Random Weapon",
     "스탯": "Stat Jolt",
     "끌어와": "Pull Enemies",
@@ -89,7 +90,8 @@
         "Slow Motion",
         "Double Time",
         "No Stamina",
-        "Random Weapon"
+        "Random Weapon",
+        "No Roll"
       ]
     },
     {
