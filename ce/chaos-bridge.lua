@@ -304,7 +304,9 @@ local function patchedTablePath(ctPath)
   return out
 end
 
+local lastCtPath
 local function setup(ctPath)
+  lastCtPath = ctPath
   local pid = getProcessIDFromProcessName('eldenring.exe')
   if not pid or pid == 0 then error('eldenring.exe not running') end
   if getOpenedProcessID() ~= pid then
@@ -530,6 +532,16 @@ local function execLine(line)
   if not kind then return end
   local h = handlers[kind]
   if not h then return log('unknown command: ' .. line) end
+  -- 어댑터를 켜 둔 채 게임만 다시 켠 경우: 명령마다 PID 를 비교해 새 게임에 자동으로 다시 붙는다
+  -- (테이블은 이미 로드돼 있어 몇 초면 끝난다. 예전엔 npm run attach 를 다시 돌려야 했고, 안 하면 효과가 조용히 실패했다)
+  if kind ~= 'setup' and (lastCtPath or getAddressList().Count > 0) then
+    local pid = getProcessIDFromProcessName('eldenring.exe')
+    if pid and pid ~= 0 and pid ~= getOpenedProcessID() then
+      log('game restarted (pid ' .. tostring(getOpenedProcessID()) .. ' -> ' .. pid .. '), reattaching')
+      local ok, err = pcall(setup, lastCtPath or '')
+      if not ok then log('FAIL auto reattach -> ' .. tostring(err)) end
+    end
+  end
   local ok, err
   if kind == 'lua' then
     ok, err = pcall(h, rest)
