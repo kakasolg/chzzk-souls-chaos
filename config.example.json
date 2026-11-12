@@ -49,6 +49,8 @@
     "무기": "Random Weapon",
     "스탯": "Stat Jolt",
     "끌어와": "Pull Enemies",
+    "거인": "Giant Player",
+    "꼬마": "Tiny Player",
     "뚱보": "Wide Player",
     "종이": "Paper Player"
   },
@@ -67,8 +69,10 @@
         "Half HP",
         "No FP",
         "Fake Crash",
+        "Tiny Player",
         "Wide Player",
         "Paper Player",
+        "Giant Player",
         "Stat Jolt"
       ]
     },
@@ -152,10 +156,7 @@
     "cooldownMs": 30000,
     "maxAmount": 20000
   },
-  "_disabled_note": "Giant Player / Tiny Player: 1.17.2 에서 효과가 끝나 수치가 1 로 돌아와도 캐릭터가 늘어난 채 남는 문제가 있어 꺼 둠 (docs/DEVELOPMENT.md)",
   "disabled": [
-    "Giant Player",
-    "Tiny Player",
     "Ally Wolf",
     "Ally Black Knife",
     "Ally Crucible Knight",
