@@ -73,7 +73,7 @@ export class Router {
    *    시청자별 쿨다운(demo.cooldownMs, 기본 30초)과 금액 상한(demo.maxAmount, 기본 20000)
    * 반환: { effect, reason } | { donation: {...} } | { subscription: {...} } | null
    */
-  forChat({ content, profile }) {
+  forChat({ content, profile, userRoleCode }) {
     const prefix = this.cfg.chatCommands?.prefix ?? this.cfg.demo?.prefix ?? '!';
     const text = (content ?? '').trim();
     if (!text.startsWith(prefix)) return null;
@@ -83,7 +83,9 @@ export class Router {
     // 1) 스트리머 직접 발동
     const cc = this.cfg.chatCommands;
     if (cc?.enabled && body.startsWith('fx ')) {
-      if (cc.roles?.length && !cc.roles.includes(profile?.userRoleCode)) return null;
+      // 치지직 공식 CHAT 이벤트는 userRoleCode 가 최상위 필드 (유튜브·가짜 이벤트도 같은 모양으로 보냄)
+      const role = userRoleCode ?? profile?.userRoleCode;
+      if (cc.roles?.length && !cc.roles.includes(role)) return null;
       const arg = body.slice(3).trim();
       const effect = this.cfg.keywords?.[arg] ?? this.all.find((n) => n.toLowerCase() === arg.toLowerCase());
       return effect ? { effect, reason: 'chat' } : null;

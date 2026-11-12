@@ -147,7 +147,8 @@ local function chrPosAddrs(p)
   local ok2, p2 = pcall(readQword, p1 + 0x68); if not ok2 or not p2 or p2 == 0 then return nil end
   local pos = p2 + 0x70
   local ok3, p3 = pcall(readQword, p2 + 0xA8)
-  local ok4, p4 = ok3 and p3 and p3 ~= 0 and pcall(readQword, p3 + 0x18)
+  local ok4, p4 = false, nil
+  if ok3 and p3 and p3 ~= 0 then ok4, p4 = pcall(readQword, p3 + 0x18) end
   local pos2 = (ok4 and p4 and p4 ~= 0) and (p4 + 0x80) or nil
   return pos, pos2
 end

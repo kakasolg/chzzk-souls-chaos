@@ -14,7 +14,8 @@ if (a === 'sub') {
   kind = 'chat';
   body = {
     channelId: 'test', senderChannelId: 'test',
-    profile: { nickname: c ?? '스트리머', userRoleCode: 'streamer' },
+    profile: { nickname: c ?? '스트리머' },
+    userRoleCode: 'streamer',
     content: b ?? '!fx Heal HP', messageTime: Date.now(),
   };
 } else {

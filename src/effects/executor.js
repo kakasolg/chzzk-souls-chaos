@@ -37,7 +37,8 @@ export class EffectExecutor extends EventEmitter {
     this.minGapMs = minGapMs;
     this.gapMs = gapMs;
     this.maxPending = maxPending;
-    this.active = new Map(); // name → def (끌 때 off 를 실행하려고)
+    this.active = new Map(); // runId → def (끌 때 off 를 실행하려고; 같은 효과가 겹쳐도 따로 추적)
+    this.runSeq = 0;
     this.queue = [];
     this.lastStart = 0;
     this.draining = false;
@@ -136,10 +137,12 @@ export class EffectExecutor extends EventEmitter {
   }
 
   async #run(name, def, meta) {
-    this.active.set(name, def);
+    const runId = ++this.runSeq;
+    this.active.set(runId, def);
     const info = { name, label: def.label ?? name, ...meta };
     this.emit('start', info);
     const duration = def.duration ?? this.table.defaultDuration ?? 30000;
+    let offDone = false;
     try {
       await this.#runCommands(def.on ?? []);
       if (def.every) {
@@ -151,9 +154,12 @@ export class EffectExecutor extends EventEmitter {
       } else if (def.off) {
         await sleep(duration);
       }
+      offDone = true;
       await this.#runCommands(def.off ?? []);
     } finally {
-      this.active.delete(name);
+      // on 이 중간에 실패해도 일부는 적용됐을 수 있으니 off 는 꼭 보낸다
+      if (!offDone) await this.#runCommands(def.off ?? []).catch((e) => this.emit('error', e));
+      this.active.delete(runId);
       this.emit('end', info);
     }
     return true;

@@ -9,7 +9,13 @@ const SOCKET_OPTS = {
   transports: ['websocket'],
 };
 
-const parse = (d) => (typeof d === 'string' ? JSON.parse(d) : d);
+const parse = (d) => {
+  try {
+    return typeof d === 'string' ? JSON.parse(d) : d ?? {};
+  } catch {
+    return {};
+  }
+};
 
 /**
  * 치지직 Open API 세션(유저). 스트리머 Access Token 으로 세션을 만들고
@@ -46,7 +52,7 @@ export class ChzzkSession extends EventEmitter {
     socket.on('SYSTEM', async (raw) => {
       const msg = parse(raw);
       if (msg.type === 'connected') {
-        const key = msg.data.sessionKey;
+        const key = msg.data?.sessionKey;
         try {
           for (const ev of this.events) await api.subscribe(token, ev, key);
           this.backoff = 2000;

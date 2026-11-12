@@ -14,7 +14,7 @@ const API = 'https://www.googleapis.com/youtube/v3';
  * 이벤트는 치지직 세션과 같은 모양으로 내보내서 라우터가 구분 없이 처리한다:
  *   donation     { donatorNickname, payAmount(원화 환산 문자열), donationText, currency, amountDisplay }
  *   subscription { subscriberNickname, tierName, month }
- *   chat         { profile: { nickname, userRoleCode }, content }
+ *   chat         { profile: { nickname }, userRoleCode, content }
  *
  * ── 알려진 한계 ──────────────────────────────
  *  · 폴링 방식이라 지연이 3~5초 있다 (pollingIntervalMillis 를 따른다).
@@ -202,7 +202,7 @@ export class YouTubeSource extends EventEmitter {
         });
         break;
       case 'textMessageEvent':
-        this.emit('chat', { profile: { nickname, userRoleCode: role }, content: s.displayMessage ?? '' });
+        this.emit('chat', { profile: { nickname }, userRoleCode: role, content: s.displayMessage ?? '' });
         break;
       default:
         break;

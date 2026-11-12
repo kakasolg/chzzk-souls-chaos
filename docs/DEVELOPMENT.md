@@ -73,6 +73,7 @@ tools/
 | 장시간 방송 | 유튜브 쿼터 소진(약 2.7시간), 토큰 갱신(1시간마다), 브릿지 장시간 안정성 미검증 |
 | 레거시 `devpoland-hotkey` 프로필 | 현재 게임 버전에서 미검증 (devPoland CT 가 2025-04 이후 갱신 없음) |
 | Cheat Engine 7.7 | 미검증 (7.6 만) |
+| socket.io-client 2.0.3 고정 | 치지직 공식 문서의 지원 범위(1.0.0 ~ 2.0.3)에 맞춤. `npm audit` 의 xmlhttprequest-ssl 경고는 polling 전송용 모듈이라, websocket 전송만 쓰는 이 코드(`src/chzzk/session.js`)에는 해당 없음 |
 | 다른 PC / 다른 Windows 버전 | 이 PC 한 대에서만 |
 | OBS 오버레이 | 브라우저에서 동작 확인, OBS 안에서 실제 표시는 확인 안 함 |
 
