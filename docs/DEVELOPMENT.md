@@ -32,7 +32,7 @@ tools/
 | 구성 | 버전 | 비고 |
 |---|---|---|
 | OS | Windows 11 Pro (10.0.26200) | Windows 전용 (CE·PowerShell 의존) |
-| Elden Ring | **App 1.17.1 / Regulation 1.17.1** (eldenring.exe 2.7.1.0), Shadow of the Erdtree 설치 | Steam, `start_game_in_offline_mode.exe` 로 오프라인 실행, 창 모드 |
+| Elden Ring | **App 1.17.2 / Regulation 1.17.3** (eldenring.exe 2.7.2.0), Shadow of the Erdtree 설치 — 2026-11-12 재검증 (처음 검증은 1.17.1 / 2.7.1.0) | Steam, `start_game_in_offline_mode.exe` 로 오프라인 실행, 창 모드 |
 | Cheat Engine | **7.6** (Scoop `extras/cheat-engine`, 번들 없음) | 7.7 은 미검증. Hexinton 테이블이 "7.7 권장" 팝업을 띄우지만 7.6 에서 문제 없음 (`npm run attach` 가 팝업을 막음) |
 | 치트 테이블 | **Hexinton All in One v8.0.4** (Nexus mods/48, 2026-09-10) | 메모리 레코드 ID 는 이 버전 기준. 테이블이 갱신되면 ID 확인 필요 |
 | Node.js | 24.19 (20 이상이면 됨) | |
