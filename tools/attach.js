@@ -23,11 +23,13 @@ const tail = (n = 1) => (fs.existsSync(log) ? fs.readFileSync(log, 'utf8').trim(
 const ceRunning = () => /cheatengine/i.test(execSync('tasklist /FI "IMAGENAME eq cheatengine-x86_64.exe" /NH', { encoding: 'utf8' }));
 
 /** 명령을 보내고, 로그에 pattern 이 새로 찍힐 때까지 기다린다 (timeoutMs). 새로 찍힌 줄들을 돌려준다. */
-async function send(line, pattern, timeoutMs) {
+async function send(line, pattern, timeoutMs, resendMs = 0) {
   const before = logSize();
   fs.appendFileSync(cmd, line + '\n');
-  for (let waited = 0; waited < timeoutMs; waited += 250) {
+  for (let waited = 250; waited <= timeoutMs; waited += 250) {
     await sleep(250);
+    // 브릿지는 켜질 때 남아 있던 명령을 버리므로, CE 가 막 시작되는 동안에는 다시 보낸다
+    if (resendMs && waited % resendMs === 0) fs.appendFileSync(cmd, line + '\n');
     if (logSize() > before) {
       const added = fs.readFileSync(log, 'utf8').slice(before);
       if (pattern.test(added)) return added.trim();
@@ -59,7 +61,7 @@ if (ceRunning()) {
 }
 
 // 2. 브릿지 응답 확인 (CE 시작에 20~30초 걸릴 수 있음)
-if (!(await send('ping', /pong/, 60000))) {
+if (!(await send('ping', /pong/, 60000, 3000))) {
   console.error('브릿지가 응답하지 않습니다 (60초). npm run install-bridge 를 했는지, CE 창에 팝업이 떠 있지 않은지 확인하세요.');
   process.exit(1);
 }

@@ -42,7 +42,16 @@
     "번개용": "Spawn Lightning Dragon",
     "아스텔": "Spawn Astel",
     "영체": "Ally Dog",
-    "멜리나": "Ally Melina"
+    "멜리나": "Ally Melina",
+    "크래시": "Fake Crash",
+    "멈춰": "Stop Moving",
+    "무기": "Random Weapon",
+    "스탯": "Stat Jolt",
+    "끌어와": "Pull Enemies",
+    "거인": "Giant Player",
+    "꼬마": "Tiny Player",
+    "뚱보": "Wide Player",
+    "종이": "Paper Player"
   },
   "tiers": [
     {
@@ -57,7 +66,13 @@
         "Ultra Zoom",
         "Quake Pro FOV",
         "Half HP",
-        "No FP"
+        "No FP",
+        "Fake Crash",
+        "Tiny Player",
+        "Wide Player",
+        "Paper Player",
+        "Giant Player",
+        "Stat Jolt"
       ]
     },
     {
@@ -73,7 +88,8 @@
         "Skeletons",
         "Slow Motion",
         "Double Time",
-        "No Stamina"
+        "No Stamina",
+        "Random Weapon"
       ]
     },
     {
@@ -88,7 +104,9 @@
         "Black Knife",
         "One HP",
         "Teleport Random Grace",
-        "Pause Game"
+        "Pause Game",
+        "Stop Moving",
+        "Pull Enemies"
       ]
     },
     {

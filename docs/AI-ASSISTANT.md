@@ -132,6 +132,12 @@ CHEAT_ENGINE_EXE=       # CE 가 기본 경로에 없을 때만
 - `Ultra Zoom` — 초근접 줌
 - `Quake Pro FOV` — 광각 FOV
 - `Teleport Random Grace` — 랜덤 은총 이동
+- `Fake Crash` — 가짜 크래시 (3.5초 멈춤)
+- `Stop Moving` — 이동 정지 (5초)
+- `Random Weapon` — 오른손 무기 랜덤 교체 (30초 뒤 원래대로)
+- `Stat Jolt` — 능력치 하나 ±5 (60초 뒤 원래대로)
+- `Pull Enemies` — 40m 안 일반 적 최대 8마리를 플레이어 주변으로 (보스 제외)
+- `Giant Player` — 거인화 / `Tiny Player` — 꼬마화 / `Wide Player` — 뚱보화 / `Paper Player` — 종이 인간 (30초)
 - `God Mode` — 무적 (보상)
 - `One Hit Kill` — 한방컷 (보상)
 - `Unlimited Stamina` — 무한 스태미나 (보상)

@@ -20,6 +20,11 @@
     read <id> [id ...]       레코드 값을 로그에 기록 (디버그)
     symbols                  테이블이 등록한 주요 심볼 주소를 symbols.json 에 기록 (외부 리더용)
     warp <graceId>           해당 축복으로 워프 (Hexinton Choose Grace + Invoke Warp)
+    setsave <id> <value>     원래 값을 기억해 두고 쓰기 (restore 로 되돌림)
+    restore <id> [id ...]    setsave/setrandom/jolt 전 원래 값으로 되돌리기
+    setrandom <id,id,...> <v1> <v2> ...   목록에서 하나 골라 모든 id 에 setsave (무기 랜덤)
+    jolt <delta> <id> [id ...]            id 중 하나를 골라 ±delta (능력치 흔들기, 1 아래로 안 내려감)
+    pull [반경 m] [최대 수]  가까운 일반 적을 플레이어 주변으로 끌어온다 (보스 제외)
     ping                     로그에 pong
 
   로그: %TEMP%\chzzk-souls-chaos\bridge.log  (CE Lua 엔진 창(Ctrl+Alt+L)에도 print)
@@ -304,6 +309,112 @@ local function symbols()
   log('symbols written: ' .. DIR .. '\\symbols.json')
 end
 
+-- ── 되돌릴 수 있는 값 변경 ──────────────────────────────
+-- 효과가 끝나면 원래 값으로 돌려야 하므로 처음 바꿀 때의 값을 기억한다.
+-- 같은 레코드를 두 효과가 겹쳐 바꿔도 "처음" 값만 기억하므로 마지막 restore 는 원래 값이 된다.
+chaosSaved = chaosSaved or {}
+math.randomseed(os.time())
+
+local function save(id)
+  local k = tostring(id)
+  if chaosSaved[k] == nil then chaosSaved[k] = rec(id).Value end
+end
+
+local function setsave(id, v)
+  save(id)
+  rec(id).Value = v
+end
+
+local function restore(...)
+  for _, id in ipairs({ ... }) do
+    local k = tostring(id)
+    if chaosSaved[k] ~= nil then
+      rec(id).Value = chaosSaved[k]
+      chaosSaved[k] = nil
+    end
+  end
+end
+
+local function setrandom(ids, ...)
+  local pool = { ... }
+  local v = pool[math.random(#pool)]
+  for id in ids:gmatch('[^,]+') do setsave(id, v) end
+  log('setrandom ' .. ids .. ' = ' .. v)
+end
+
+local function jolt(delta, ...)
+  local ids = { ... }
+  local id = ids[math.random(#ids)]
+  save(id)
+  local r = rec(id)
+  local cur = tonumber(r.Value) or 0
+  local d = (tonumber(delta) or 5) * (math.random(2) == 1 and 1 or -1)
+  r.Value = tostring(math.max(1, cur + d))
+  log(('jolt %s %s -> %s'):format(r.Description, cur, r.Value))
+end
+
+-- ── 적 끌어오기 ──────────────────────────────────────────
+-- WorldChrMan 의 캐릭터 배열을 돌며 가까운 일반 적의 좌표를 플레이어 주변 원 위로 옮긴다.
+-- 좌표는 맵 타일 기준이라 먼 타일의 개체는 거리 계산이 틀어지므로 반경으로 거른다.
+-- 보스(팀 7)는 제외: 보스 구역 밖으로 빼면 전투 이벤트가 깨질 수 있다.
+-- 배열 위치는 패치마다 움직인다 (1.17.1: +1F1B8, 1.17.2: +1F1C8). 그래서 "첫 항목이 플레이어인 배열"을 찾아 쓴다.
+local PULL_TEAMS = { [6] = true, [24] = true, [25] = true, [27] = true, [33] = true, [48] = true }  -- 48: 고드릭 병사·늑대 (1.17.2 실측)
+local chrListOff = nil
+local function chrPhys(p)
+  local m = readQword(p + 0x190); if not m or m == 0 then return nil end
+  local phys = readQword(m + 0x68); if not phys or phys == 0 then return nil end
+  return phys, readQword(m + 0x00)
+end
+
+local function findChrList(wcm, player)
+  for _, o in ipairs({ chrListOff, 0x1F1C8, 0x1F1B8 }) do
+    if o and readQword(readQword(wcm + o) or 0) == player then return o end
+  end
+  for o = 0x1E000, 0x20000, 8 do
+    local b = readQword(wcm + o)
+    if b and b > 0x10000 and readQword(b) == player then
+      local e = readQword(wcm + o + 8)
+      if e and e > b and e - b <= 8 * 4096 then return o end
+    end
+  end
+end
+
+local function pull(radius, maxN)
+  radius, maxN = tonumber(radius) or 40, tonumber(maxN) or 8
+  local wcm = readQword(getAddressSafe('WorldChrMan'))
+  local slot = readQword(wcm + (getAddressSafe('LocalPlayerOffset') or 0x10EF8))
+  local player = slot and readQword(slot)
+  local pphys = player and chrPhys(player)
+  if not pphys then error('player not found') end
+  local px, py, pz = readFloat(pphys + 0x70), readFloat(pphys + 0x74), readFloat(pphys + 0x78)
+  chrListOff = findChrList(wcm, player)
+  if not chrListOff then error('chr list not found') end
+  local b, e = readQword(wcm + chrListOff), readQword(wcm + chrListOff + 8)
+  local found = {}
+  for a = b, e - 8, 8 do
+    local p = readQword(a)
+    if p and p > 0x10000 and p ~= player then
+      local ok, phys, stats = pcall(chrPhys, p)
+      local team = ok and phys and readBytes(p + 0x6C, 1)
+      local hp = stats and readInteger(stats + 0x138)
+      if team and PULL_TEAMS[team] and hp and hp > 0 then
+        local x, y, z = readFloat(phys + 0x70), readFloat(phys + 0x74), readFloat(phys + 0x78)
+        local d = math.sqrt((x - px) ^ 2 + (y - py) ^ 2 + (z - pz) ^ 2)
+        if d > 3 and d <= radius then found[#found + 1] = { phys = phys, d = d } end
+      end
+    end
+  end
+  table.sort(found, function(m, n) return m.d < n.d end)
+  local n = math.min(#found, maxN)
+  for i = 1, n do
+    local ang = (i / n) * 2 * math.pi
+    writeFloat(found[i].phys + 0x70, px + math.cos(ang) * 3.5)
+    writeFloat(found[i].phys + 0x74, py + 0.5)
+    writeFloat(found[i].phys + 0x78, pz + math.sin(ang) * 3.5)
+  end
+  log(('pull: %d enemies within %dm, moved %d'):format(#found, radius, n))
+end
+
 local handlers = {
   setup      = function(...) setup(table.concat({ ... }, ' ')) end,
   symbols    = symbols,
@@ -317,6 +428,11 @@ local handlers = {
   speed      = function(x) speedhack_setSpeed(tonumber(x)) end,
   spawn      = function(chrId, npcParam) spawn(chrId, npcParam) end,
   ally       = ally,
+  setsave    = setsave,
+  restore    = restore,
+  setrandom  = setrandom,
+  jolt       = jolt,
+  pull       = pull,
   dismiss    = dismiss,
   lua        = function(code) assert(load(code))() end,
   read       = function(...)
