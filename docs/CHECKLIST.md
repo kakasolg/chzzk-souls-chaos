@@ -51,6 +51,7 @@
 - 확인: `npm run doctor` 에 `✅ 치트 테이블: eldenring_all-in-one_Hexinton-v8.0.4.CT`
 
 ### A7-a. 치지직 (치지직으로 방송하면)
+> ⚠️ **치지직 연동은 실제로 테스트된 적이 없습니다** (공식 문서대로만 작성). 아래 단계 중 하나라도 "확인" 결과가 다르면 거기서 멈추고 그 터미널 출력을 개발자에게 보내세요.
 - [ ] https://developers.chzzk.naver.com → 애플리케이션 등록
   - 애플리케이션 ID/이름: 자유. **단 `chzzk`, `naver`, `치지직`, `네이버` 단어는 넣으면 거절됨**
   - 로그인 리디렉션 URL: `http://localhost:8080/callback` (정확히 이대로)
