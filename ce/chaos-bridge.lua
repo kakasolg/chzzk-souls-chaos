@@ -36,17 +36,6 @@ local CMD = DIR .. '\\cmd.txt'
 local WORK = DIR .. '\\cmd.processing'
 local LOG = DIR .. '\\bridge.log'
 
--- Hexinton All in One 8.x 의 메모리 레코드 ID (프로필 JSON 과 동일)
-local HEX = {
-  spawner      = 1987705401,
-  spawnerInner = 1987705402,
-  chrId        = 1987705422,
-  npcParam     = 1987705425,
-  npcThink     = 1987705426,
-  enemyType    = 1987705420,
-  printPos     = 1987705434,
-  spawnDebug   = 1987705439,
-}
 
 os.execute('mkdir "' .. DIR .. '" 2>nul')
 
@@ -73,65 +62,105 @@ print = function(...)
   log('[ce print] ' .. table.concat(parts, '	'))
 end
 
--- 플레이어가 죽거나 맵을 다시 불러오면 스포너 훅이 끊긴다(스크립트는 켜져 보여도 소환 안 됨).
--- 그래서 스폰 후 SpawnedEnemy 포인터가 안 바뀌면 스포너를 껐다 켜고 한 번 더 시도한다.
-local function spawnerRetoggle()
-  rec(HEX.spawnerInner).Active = false
-  rec(HEX.spawner).Active = false
-  rec(HEX.spawner).Active = true
-  rec(HEX.spawnerInner).Active = true
+local function playerPos()
+  local base = '[[[[[WorldChrMan]+10EF8]+0]+190]+68]'
+  return readFloat(base .. '+70'), readFloat(base .. '+74'), readFloat(base .. '+78')
 end
 
-local HEX_SPAWN_X, HEX_SPAWN_Z = 1987705435, 1987705437
+-- ── 캐릭터 소환 ─────────────────────────────────────────
+-- 게임의 디버그 캐릭터 생성기(CS::CSDebugChrCreator)에 모델·NpcParam·좌표를 쓰고 +0x44 를 1 로 하면 다음 프레임에 생성된다.
+-- Hexinton 8.0.4 의 Character Spawner 는 쓰지 않는다:
+--[[
+ * ── 알려진 한계 / 1.17.2 크래시 기록 ──────────────────────────────
+ *  · Hexinton 은 생성기를 [WorldChrMan+1E648] 고정 오프셋으로 읽는데, 1.17.2 에서 그 앞에 필드가 끼어들어
+ *    생성기가 +1E658 로 밀렸다. +1E648 은 0 이라 Spawn Debug Character 가 [0+44] 에 쓰다가 게임이 크래시했다.
+ *  · 그래서 오프셋 숫자 대신 RTTI 클래스 이름으로 생성기를 찾는다. 다음 패치에 또 밀려도 따라가고,
+ *    못 찾으면 아무것도 쓰지 않고 실패 로그만 남긴다 (크래시 대신 "소환 안 됨").
+ *  · 생성기 안쪽 필드(+44 플래그, +B0 좌표, +F0 NpcParam, +100 모델, +178 플레이어형, +1B0 마지막 생성 개체)는
+ *    Hexinton·Scripts-Data-Exposer 와 같은 배치. 패치로 이 안쪽이 바뀌면 다시 확인해야 한다.
+]]
+local CREATOR_CLASS = 'CS::CSDebugChrCreator'
+local creatorOff = nil
+
+local function isCreator(p)
+  if not p or p < 0x10000 then return false end
+  local ok, n = pcall(getRTTIClassName, p)
+  return ok and n == CREATOR_CLASS
+end
+
+local function debugCreator()
+  local wcm = readQword(getAddressSafe('WorldChrMan'))
+  if not wcm or wcm == 0 then return nil end
+  if creatorOff and isCreator(readQword(wcm + creatorOff)) then return readQword(wcm + creatorOff) end
+  for off = 0x1D000, 0x20000, 8 do
+    local p = readQword(wcm + off)
+    if isCreator(p) then
+      if creatorOff ~= off then log(('spawn: %s at WorldChrMan+%X'):format(CREATOR_CLASS, off)) end
+      creatorOff = off
+      return p
+    end
+  end
+  return nil
+end
 
 local function spawnOnce(chrId, npcParam, offset)
-  rec(HEX.spawner).Active = true
-  rec(HEX.spawnerInner).Active = true
-  rec(HEX.enemyType).Value = '0'
-  rec(HEX.chrId).Value = chrId
-  rec(HEX.npcParam).Value = tostring(npcParam)
-  rec(HEX.npcThink).Value = tostring(npcParam)
-  rec(HEX.printPos).Active = true   -- 현재 플레이어 좌표를 SpawnPos 에 복사
+  local c = debugCreator()
+  if not c then error(CREATOR_CLASS .. ' not found — spawn skipped (game patch?)') end
+  if (readBytes(c + 0x44, 1) or 0) ~= 0 then error('creator busy — previous spawn not consumed yet') end
+  local px, py, pz = playerPos()
+  if not px then error('player position unavailable') end
   if offset and offset > 0 then
     -- 플레이어 몸 위가 아니라 옆에 떨어뜨려 스폰 (아군은 팀 전환 전에 어그로가 잡히지 않도록)
     local a = math.random() * 2 * math.pi
-    local x = tonumber(rec(HEX_SPAWN_X).Value) or 0
-    local z = tonumber(rec(HEX_SPAWN_Z).Value) or 0
-    rec(HEX_SPAWN_X).Value = tostring(x + math.cos(a) * offset)
-    rec(HEX_SPAWN_Z).Value = tostring(z + math.sin(a) * offset)
+    px, pz = px + math.cos(a) * offset, pz + math.sin(a) * offset
   end
-  rec(HEX.spawnDebug).Active = true
+  local model = chrId:sub(1, 5)
+  for i = 0, 4 do writeSmallInteger(c + 0x100 + i * 2, model:byte(i + 1) or 0) end
+  writeSmallInteger(c + 0x10A, 0)
+  writeInteger(c + 0xF0, npcParam)
+  writeInteger(c + 0xF4, npcParam)
+  writeInteger(c + 0xF8, 0)
+  writeInteger(c + 0xFC, 0)
+  writeBytes(c + 0x178, 0)
+  writeInteger(c + 0x17C, 0)
+  writeFloat(c + 0xB0, px); writeFloat(c + 0xB4, py); writeFloat(c + 0xB8, pz)
+  writeBytes(c + 0x44, 1)
+  return c
 end
 
-local function spawnedPtr()
-  local ok, p = pcall(readQword, 'SpawnedEnemy')
-  return (ok and p) or 0
+local function lastCreated()
+  local c = debugCreator()
+  return (c and readQword(c + 0x1B0)) or 0
 end
 
 -- onDone(ptr|nil) 은 스폰이 확인되거나 포기했을 때 호출된다 (비동기)
 local function spawn(chrId, npcParam, onDone, offset)
   local num = tonumber(chrId:match('c(%d+)'))
   npcParam = tonumber(npcParam) or (num * 10000)
-  local prev = spawnedPtr()
-  spawnOnce(chrId, npcParam, offset)
-  local tries, retried = 0, false
+  local prev = lastCreated()
+  local ok, err = pcall(spawnOnce, chrId, npcParam, offset)
+  if not ok then
+    log('spawn ' .. chrId .. ': FAILED (' .. tostring(err) .. ')')
+    if onDone then onDone(nil) end
+    return
+  end
+  local tries = 0
   local t = createTimer(nil)
   t.Interval = 20
   t.OnTimer = function(tm)
     tries = tries + 1
-    local p = spawnedPtr()
+    local p = lastCreated()
     if p ~= 0 and p ~= prev then
       tm.destroy()
       chaosLastSpawn = p
+      log(('spawn %s: ok %X'):format(chrId, p))
       if onDone then onDone(p) end
-    elseif tries == 60 and not retried then
-      retried = true
-      log('spawn ' .. chrId .. ': not registered, re-toggling spawner')
-      pcall(spawnerRetoggle)
-      pcall(spawnOnce, chrId, npcParam, offset)
-    elseif tries > 200 then
+    elseif tries > 150 then
       tm.destroy()
-      log('spawn ' .. chrId .. ': FAILED (no SpawnedEnemy after retry)')
+      -- 3초 안에 생성 안 됨: 플래그를 내려 두어 다음 소환이 막히지 않게 한다
+      local c = debugCreator()
+      if c then pcall(writeBytes, c + 0x44, 0) end
+      log('spawn ' .. chrId .. ': FAILED (not created within 3s)')
       if onDone then onDone(nil) end
     end
   end
@@ -159,10 +188,6 @@ local function chrPosAddrs(p)
   return pos, pos2
 end
 
-local function playerPos()
-  local base = '[[[[[WorldChrMan]+10EF8]+0]+190]+68]'
-  return readFloat(base .. '+70'), readFloat(base .. '+74'), readFloat(base .. '+78')
-end
 
 local FOLLOW_DIST = 9.0      -- 이보다 멀어지면 플레이어 옆으로 당겨온다 (멀어지면 게임이 개체를 정리해 버림)
 local ALLY_LIFETIME = 600    -- 초. 영체 최대 유지 시간 (ally 명령 3번째 인자로 바꿀 수 있음)
