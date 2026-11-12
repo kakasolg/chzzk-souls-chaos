@@ -279,9 +279,19 @@ local function patchedTablePath(ctPath)
 end
 
 local function setup(ctPath)
-  if getOpenedProcessID() == 0 then
-    openProcess('eldenring.exe')
-    if getOpenedProcessID() == 0 then error('eldenring.exe not running') end
+  local pid = getProcessIDFromProcessName('eldenring.exe')
+  if not pid or pid == 0 then error('eldenring.exe not running') end
+  if getOpenedProcessID() ~= pid then
+    -- 게임만 재시작된 경우: 옛 프로세스에 켜 두었던 스크립트를 실행 없이 끄고 새 프로세스에 다시 붙인다
+    -- (그냥 끄면 [DISABLE] 이 죽은 프로세스에 쓰려다 실패한다). 기억해 둔 원래 값도 옛 캐릭터 것이라 버린다.
+    local al = getAddressList()
+    for i = al.Count - 1, 0, -1 do
+      local r = al[i]
+      if r.Active then pcall(function() r.disableWithoutExecute() end) end
+    end
+    chaosSaved = {}
+    openProcess(pid)
+    if getOpenedProcessID() ~= pid then error('openProcess failed for pid ' .. pid) end
   end
   if getAddressList().Count == 0 then
     silenceDialogs()
