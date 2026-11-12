@@ -36,6 +36,15 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     return res.end(overlayHtml);
   }
+  if (req.method === 'GET' && req.url === '/state') {
+    // 게임 화면 표시 창(tools/screen-overlay.ps1)용: 지금 걸린 효과와 대기 수
+    const now = Date.now();
+    for (const [k, v] of onScreen) if (v.until < now) onScreen.delete(k);
+    const active = [...onScreen.values()].map((v) => ({ text: v.text, left: Math.max(0, Math.ceil((v.until - now) / 1000)) }));
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    const n = executor.queue.length;
+    return res.end(JSON.stringify({ active, pending: n, footer: n ? `대기 ${n}건` : '' }));
+  }
   if (req.method === 'GET' && req.url === '/effects') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify(executor.names()));
@@ -66,11 +75,21 @@ const broadcast = (msg) => {
   const s = JSON.stringify(msg);
   for (const c of wss.clients) if (c.readyState === 1) c.send(s);
 };
+// 게임 화면 표시용 목록. 1회성 효과(off 없음)는 5초만 보여 준다.
+const onScreen = new Map();
+const lasting = (name) => { const d = executor.get(name) ?? {}; return Boolean(d.off || d.every); };
+let screenSeq = 0;
 executor.on('start', (e) => {
   console.log(`▶ ${e.label} (${e.name}) ← ${e.by ?? '?'} ${e.amount ? e.amount + '원' : ''} [${e.source}]`);
   broadcast({ type: 'start', ...e });
+  const ms = lasting(e.name) ? (executor.get(e.name).duration ?? table.defaultDuration ?? 30000) : 5000;
+  e.screenKey = ++screenSeq; // start 와 end 는 같은 객체로 온다
+  onScreen.set(e.screenKey, { text: `${e.label} ← ${e.by ?? '?'}${e.amount ? ` ${e.amount}원` : ''}`, until: Date.now() + ms });
 });
-executor.on('end', (e) => broadcast({ type: 'end', ...e }));
+executor.on('end', (e) => {
+  broadcast({ type: 'end', ...e });
+  if (lasting(e.name)) onScreen.delete(e.screenKey);
+});
 executor.on('queued', (e) => {
   if (e.position > 0) console.log(`⏳ ${e.label} 대기 ${e.position}번째 ← ${e.by ?? '?'}`);
   broadcast({ type: 'queued', ...e });

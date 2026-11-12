@@ -12,6 +12,7 @@
     "keys": "node tools/list-effects.js",
     "install-bridge": "node tools/install-bridge.js",
     "attach": "node tools/attach.js",
+    "screen": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/screen-overlay.ps1",
     "doctor": "node tools/doctor.js"
   },
   "engines": {
