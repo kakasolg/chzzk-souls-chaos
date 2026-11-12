@@ -1,6 +1,6 @@
 # Shows the active chaos effects on top of the Elden Ring window (player's own screen).
 #  - transparent, always on top, click-through: mouse/keyboard go straight to the game
-#  - follows the game window's top-right corner (windowed / borderless only, not exclusive fullscreen)
+#  - sits at the game window's top-left, under the HP/FP/stamina bars, and follows the window (windowed / borderless only, not exclusive fullscreen)
 #  - excluded from screen capture, so OBS display capture does not show it twice
 #    (viewers keep seeing the OBS browser-source overlay as before)
 # Usage: npm run screen      (adapter must be running: npm start)
@@ -76,8 +76,8 @@ $win.Left = -10000
 $win.Top = 0
 
 $panel = New-Object System.Windows.Controls.StackPanel
-$panel.HorizontalAlignment = 'Right'
-$panel.Margin = '0,8,12,0'
+$panel.HorizontalAlignment = 'Left'
+$panel.Margin = '16,0,0,0'
 $win.Content = $panel
 
 $shadow = New-Object System.Windows.Media.Effects.DropShadowEffect
@@ -92,8 +92,8 @@ function New-Line([string]$text, $brush, [int]$size) {
   $t.FontFamily = 'Malgun Gothic'
   $t.FontWeight = 'Bold'
   $t.FontSize = $size
-  $t.TextAlignment = 'Right'
-  $t.HorizontalAlignment = 'Right'
+  $t.TextAlignment = 'Left'
+  $t.HorizontalAlignment = 'Left'
   $t.Effect = $shadow
   $t.Margin = '0,1,0,1'
   [void]$panel.Children.Add($t)
@@ -119,8 +119,9 @@ $timer.Add_Tick({
   $dpi = [System.Windows.PresentationSource]::FromVisual($win)
   $sx = 1.0; $sy = 1.0
   if ($dpi) { $sx = $dpi.CompositionTarget.TransformToDevice.M11; $sy = $dpi.CompositionTarget.TransformToDevice.M22 }
-  $win.Left = ($c[0] + $c[2]) / $sx - $win.Width
-  $win.Top = $c[1] / $sy + 40
+  # HP/FP/stamina bars take roughly the top 13% of the game screen; start just below them
+  $win.Left = $c[0] / $sx
+  $win.Top = ($c[1] + $c[3] * 0.15) / $sy
   $win.Topmost = $false; $win.Topmost = $true
 
   try {
