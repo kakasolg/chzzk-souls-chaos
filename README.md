@@ -254,6 +254,7 @@ npm run fake -- chat "!fx Kill Player"         # 스트리머 채팅 명령
 | `npm run attach`가 "브릿지가 응답하지 않습니다" | Cheat Engine이 두 개 떠 있지 않은지 확인 (하나만). CE 창에 팝업이 떠 있으면 닫기 |
 | 소환은 되는데 나오지 않음 | 죽은 직후라면 몇 초 뒤 다시 시도됨. 계속 안 되면 CE에서 `[ Enable ]`을 껐다 켜기 |
 | 유튜브 "not enabled for live streaming" | 채널에서 라이브 활성화 후 24시간 대기 |
+| 유튜브 `token -> 400 Bad Request` 가 반복되고 "진행 중인 방송 없음" | 유튜브 로그인이 만료됨. 구글 OAuth 앱이 "테스트" 상태면 **7일마다** 만료됩니다. `npm run auth:youtube` 로 방송 채널 계정으로 다시 로그인하고 어댑터를 다시 켜세요 (Google Cloud 에서 앱을 "프로덕션"으로 게시하면 만료되지 않음) |
 | 유튜브 채팅이 안 잡힘 | 방송이 실제로 "라이브" 상태인지, 로그인한 계정이 방송 채널과 같은지 확인 |
 | 컨트롤러가 안 먹음 | 게임 창을 한 번 클릭 (포커스). Steam 밖에서 실행했다면 Steam 설정의 "Xbox 컨트롤러 Steam 입력"이 패드를 잡고 있을 수 있음 |
 | 거인화 뒤 캐릭터가 늘어난 채 남음 | ReShade/DLSS 그래픽 모드(`dxgi.dll`)와 충돌. 그 모드를 빼거나, config 의 `disabled` 에 `"Giant Player"`, `"Tiny Player"`, `"Wide Player"`, `"Paper Player"` 를 넣으세요. 이미 늘어났으면 다른 축복으로 이동하거나 타이틀로 나갔다 들어오세요 |
