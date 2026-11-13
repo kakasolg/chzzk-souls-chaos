@@ -135,7 +135,11 @@ function handleEvent(kind, data, source) {
   } else if (kind === 'chat') {
     const r = router.forChat(data);
     by = data.profile?.nickname;
-    if (!r) return;
+    if (!r) {
+      // 스트리머가 친 !fx 가 아무 효과도 못 찾으면 조용히 버리지 말고 이유를 보여 준다
+      if (/^!fx\s/i.test(data.content ?? '')) console.log(`💬 ${by}: ${data.content} → 효과를 못 찾음 (한글 키워드 예: !fx 거인, 또는 정확한 이름 예: !fx Giant Player) 또는 권한 없음`);
+      return;
+    }
     if (r.cooldown) return console.log(`🕒 ${by}: 데모 쿨다운 중 (무시)`);
     if (r.donation) { console.log(`🎭 ${by}: "${data.content}" → 데모 후원 ${r.donation.payAmount}원`); return handleEvent('donation', r.donation, source + ':demo'); }
     if (r.subscription) { console.log(`🎭 ${by}: "${data.content}" → 데모 구독`); return handleEvent('subscription', r.subscription, source + ':demo'); }
