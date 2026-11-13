@@ -322,14 +322,21 @@ local function setup(ctPath)
   if getOpenedProcessID() ~= pid then
     -- 게임만 재시작된 경우: 옛 프로세스에 켜 두었던 스크립트를 실행 없이 끄고 새 프로세스에 다시 붙인다
     -- (그냥 끄면 [DISABLE] 이 죽은 프로세스에 쓰려다 실패한다). 기억해 둔 원래 값도 옛 캐릭터 것이라 버린다.
+    -- 켜져 있던 스크립트(카메라 FOV 스크립트처럼 어댑터 시작 때 한 번만 켜는 것)는 새 프로세스에서 다시 켠다.
+    -- 안 그러면 그 스크립트에 기대는 레코드가 '??' 가 된다.
     local al = getAddressList()
+    local reenable = {}
     for i = al.Count - 1, 0, -1 do
       local r = al[i]
-      if r.Active then pcall(function() r.disableWithoutExecute() end) end
+      if r.Active then
+        if r.Type == vtAutoAssembler and r.ID ~= ENABLE_ID then reenable[#reenable + 1] = r.ID end
+        pcall(function() r.disableWithoutExecute() end)
+      end
     end
     chaosSaved = {}
     openProcess(pid)
     if getOpenedProcessID() ~= pid then error('openProcess failed for pid ' .. pid) end
+    chaosReenable = reenable
   end
   if getAddressList().Count == 0 then
     silenceDialogs()
@@ -338,6 +345,15 @@ local function setup(ctPath)
   local en = getAddressList().getMemoryRecordByID(ENABLE_ID)
   if not en then error('[ Enable ] not found — is this the Hexinton table?') end
   if not en.Active then en.Active = true end
+  if chaosReenable then
+    -- 바깥(부모) 스크립트부터 켜지도록 목록 순서(위→아래)로
+    for i = #chaosReenable, 1, -1 do
+      local r = getAddressList().getMemoryRecordByID(chaosReenable[i])
+      if r and not r.Active then pcall(function() r.Active = true end) end
+    end
+    log('re-enabled ' .. #chaosReenable .. ' script(s) after reattach')
+    chaosReenable = nil
+  end
   log(('setup: pid=%d entries=%d enable=%s'):format(getOpenedProcessID(), getAddressList().Count, tostring(en.Active)))
   injectOverlay()
 end
@@ -364,9 +380,17 @@ end
 chaosSaved = chaosSaved or {}
 math.randomseed(os.time())
 
+-- 포인터가 아직 안 풀린 레코드(게임 로딩 중, 재접속 직후 카메라 스크립트가 꺼진 FOV 등)는 Value 가 '??' 다.
+-- 그 값을 기억했다가 restore 에서 쓰면 CE 가 "?? is an invalid float" 를 내고 브릿지가 멈췄다 (2026-11-12).
+local function readable(v) return v ~= nil and v ~= '' and not tostring(v):find('?', 1, true) end
+
 local function save(id)
   local k = tostring(id)
-  if chaosSaved[k] == nil then chaosSaved[k] = rec(id).Value end
+  if chaosSaved[k] == nil then
+    local v = rec(id).Value
+    if not readable(v) then error(('record %s not readable now (%s)'):format(k, tostring(v))) end
+    chaosSaved[k] = v
+  end
 end
 
 local function setsave(id, v)
@@ -377,9 +401,11 @@ end
 local function restore(...)
   for _, id in ipairs({ ... }) do
     local k = tostring(id)
-    if chaosSaved[k] ~= nil then
-      rec(id).Value = chaosSaved[k]
-      chaosSaved[k] = nil
+    local v = chaosSaved[k]
+    chaosSaved[k] = nil
+    if readable(v) then
+      local ok, err = pcall(function() rec(id).Value = v end)
+      if not ok then log('restore ' .. k .. ' failed: ' .. tostring(err)) end
     end
   end
 end
@@ -566,16 +592,26 @@ local function execLine(line)
 end
 
 local function tick()
+  -- 지난 묶음이 도중에 죽어 WORK 가 남아 있으면 rename 이 영원히 실패해 브릿지가 멈춘다 (2026-11-12) → 먼저 치운다
+  local stale = io.open(WORK, 'r')
+  if stale then
+    stale:close()
+    log('stale ' .. WORK .. ' found (previous batch aborted), discarding')
+    os.remove(WORK)
+  end
   -- 어댑터가 append 중이면 rename 이 실패하므로 다음 tick 에 다시 시도
   if not os.rename(CMD, WORK) then return end
   local f = io.open(WORK, 'r')
   if not f then return end
+  -- 실행 전에 다 읽고 파일부터 지운다: 한 줄이 잡히지 않는 오류로 죽어도 다음 tick 은 정상으로 돈다
+  local lines = {}
   for line in f:lines() do
     line = line:gsub('\r', '')
-    if line ~= '' then execLine(line) end
+    if line ~= '' then lines[#lines + 1] = line end
   end
   f:close()
   os.remove(WORK)
+  for _, line in ipairs(lines) do execLine(line) end
 end
 
 -- CE 가 꺼져 있던 동안 쌓인 명령은 버린다 (다시 켜질 때 즉사 같은 효과가 한꺼번에 터지지 않게)
