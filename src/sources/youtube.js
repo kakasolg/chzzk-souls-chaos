@@ -104,12 +104,13 @@ export class YouTubeSource extends EventEmitter {
     return json;
   }
 
-  /** 진행 중인 내 방송의 liveChatId. 없으면 null (방송 시작 전). */
-  async #findLiveChat() {
+  /** 진행 중인 내 방송 중 가장 최근에 시작한 것의 liveChatId. 없으면 null (방송 시작 전). */
+  async #findLiveChat({ quiet = false } = {}) {
     const r = await this.#get('/liveBroadcasts', { part: 'snippet', broadcastStatus: 'active', broadcastType: 'all', maxResults: 5 });
-    const b = r.items?.find((i) => i.snippet?.liveChatId);
+    const started = (i) => Date.parse(i.snippet?.actualStartTime ?? i.snippet?.publishedAt ?? 0) || 0;
+    const b = (r.items ?? []).filter((i) => i.snippet?.liveChatId).sort((a, c) => started(c) - started(a))[0];
     if (!b) return null;
-    this.emit('broadcast', { title: b.snippet.title, id: b.id });
+    if (!quiet) this.emit('broadcast', { title: b.snippet.title, id: b.id });
     return b.snippet.liveChatId;
   }
 
@@ -130,8 +131,25 @@ export class YouTubeSource extends EventEmitter {
     if (this.stopped) return;
 
     let first = true; // 첫 페이지는 이미 지나간 채팅이라 무시
+    let lastCheck = Date.now();
     while (!this.stopped) {
       let wait = this.minPollMs;
+      // OBS 에서 방송을 끄고 새 방송을 만들면 옛 방송이 "진행 중"으로 남아 빈 채팅만 계속 돌아올 수 있다.
+      // 1분마다 더 최근에 시작한 방송이 있는지 보고 있으면 그쪽으로 옮긴다 (쿼터 1/회).
+      if (Date.now() - lastCheck > 60000) {
+        lastCheck = Date.now();
+        try {
+          const newest = await this.#findLiveChat({ quiet: true });
+          if (newest && newest !== this.liveChatId) {
+            this.emit('ended');
+            this.liveChatId = null;
+            this.pageToken = null;
+            return this.start();
+          }
+        } catch (e) {
+          this.emit('error', e);
+        }
+      }
       try {
         const r = await this.#get('/liveChat/messages', { liveChatId: this.liveChatId, part: 'snippet,authorDetails', pageToken: this.pageToken, maxResults: 200 });
         this.pageToken = r.nextPageToken;
